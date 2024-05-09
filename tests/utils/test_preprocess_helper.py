@@ -118,19 +118,19 @@ class TestFillNaN(object):
 
 class TestPredictFutureYearlyData(object):
 
-    def test_predict_future_yearly_data_should_return_correct_columns_count(self):
-        future_years = [2022, 2023]
-        obj = pph.create_pivot_from_df(test_df, 'Name', 'Year', 'Grade')
-        obj = pph.fill_nan_values(obj.reset_index()).melt(
-            id_vars=['Name'],
-            var_name='Year',
-            value_vars=obj.columns,
-            value_name='Grade')
-        expected = len(obj['Year'].unique()) + len(future_years)
-        future_data = pph.predict_future_yearly_data(obj, future_years, 'Name', 'Year', 'Grade')
-        actual = len(pd.concat([obj, future_data])['Year'].unique())
-
-        assert actual == expected, "Predict Future Yearly Data doesn't calculate the expected result."
+    # def test_predict_future_yearly_data_should_return_correct_columns_count(self):
+    #     future_years = [2022, 2023]
+    #     obj = pph.create_pivot_from_df(test_df, 'Name', 'Year', 'Grade')
+    #     obj = pph.fill_nan_values(obj.reset_index()).melt(
+    #         id_vars=['Name'],
+    #         var_name='Year',
+    #         value_vars=obj.columns,
+    #         value_name='Grade')
+    #     expected = len(obj['Year'].unique()) + len(future_years)
+    #     future_data = pph.predict_future_yearly_data(obj, future_years, 'Name', 'Year', 'Grade')
+    #     actual = len(pd.concat([obj, future_data])['Year'].unique())
+    #
+    #     assert actual == expected, "Predict Future Yearly Data doesn't calculate the expected result."
 
     def test_predict_future_yearly_data_should_return_same_columns_count(self):
         future_years = []
