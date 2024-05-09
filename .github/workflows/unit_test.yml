@@ -58,6 +58,7 @@ jobs:
           poetry run sphinx-apidoc -o docs src/
           cd docs
           poetry run pip install sphinx_rtd_theme
+          ls
           make html
       - name: update changes
         run: |
