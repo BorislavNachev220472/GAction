@@ -55,7 +55,7 @@ jobs:
           coverage run -m pytest && coverage  html
 
       - name: switching from HTTPS to SSH
-        run: git remote set-url origin ${{ secrets.ssh }}
+        run: git remote set-url origin git@github.com:BorislavNachev220472/GAction.git
       - name: check for changes
         run: git status
       - name: stage changed files
