@@ -53,12 +53,11 @@ jobs:
         run: |
           source .venv/bin/activate
           coverage run -m pytest && coverage html
-#      - name: switching from HTTPS to SSH
-#        run: git remote set-url origin git@github.com:BorislavNachev220472/GAction.git
       - name: check for changes
         run: |
           git config user.name "Borislav Nachev"
           git config user.email "220472@buas.nl"
           git add .
-          git commit -m "generated"
+          git add htmlcov/index.html 
+          git commit -m "auto commit"
           git push
