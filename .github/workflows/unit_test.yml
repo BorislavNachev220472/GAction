@@ -60,6 +60,9 @@ jobs:
         run: git status
       - name: stage changed files
         run: git add .
+      - name: setting user
+        run: git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
       - name: commit changed files
         run: git commit -m "Auto updating generated Coverage"
       - name: fetch from master
