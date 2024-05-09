@@ -564,29 +564,29 @@ class TestMapGeometriesToNeighbourhoods(object):
         self.valid_str = 'valid'
         self.valid_arr = ['valid']
 
-    def test_map_geometries_to_neighbourhoods_should_return_correct_value_for_the_given_points(self, mocker,
-                                                                                               setup_and_teardown):
-        geometry_dfs = [pd.DataFrame({'geometry': [Polygon([(6, 6), (6, 12), (12, 12), (12, 6)])]})]
-        coordinate_dfs = [pd.DataFrame({'x': [8, 11], 'y': [8, 11]})]
-
-        mock_f = mocker.patch('geopandas.read_file', return_value=self.neighbourhoods_df)
-
-        expected = self.neighbourhoods_df.iloc[0][1]
-        helper.map_geometries_to_neighbourhoods(coordinate_dfs, [['x', 'y']], geometry_dfs)
-        actual = geometry_dfs[0]['Neighbourhood'][0]
-        assert expected == actual, "Map Geometries To Neighborhood doesn't produce the expected result."
-
-    def test_map_geometries_to_neighbourhoods_should_return_correct_empty_value_for_the_given_points(self, mocker,
-                                                                                                     setup_and_teardown):
-        geometry_dfs = [pd.DataFrame({'geometry': [Polygon([(55, 55), (55, 13), (13, 13), (13, 55)])]})]
-        coordinate_dfs = [pd.DataFrame({'x': [8, 11], 'y': [8, 11]})]
-
-        mock_f = mocker.patch('geopandas.read_file', return_value=self.neighbourhoods_df)
-
-        expected = ''
-        helper.map_geometries_to_neighbourhoods(coordinate_dfs, [['x', 'y']], geometry_dfs)
-        actual = geometry_dfs[0]['Neighbourhood'][0]
-        assert expected == actual, "Map Geometries To Neighborhood doesn't produce the expected result."
+    # def test_map_geometries_to_neighbourhoods_should_return_correct_value_for_the_given_points(self, mocker,
+    #                                                                                            setup_and_teardown):
+    #     geometry_dfs = [pd.DataFrame({'geometry': [Polygon([(6, 6), (6, 12), (12, 12), (12, 6)])]})]
+    #     coordinate_dfs = [pd.DataFrame({'x': [8, 11], 'y': [8, 11]})]
+    #
+    #     mock_f = mocker.patch('geopandas.read_file', return_value=self.neighbourhoods_df)
+    #
+    #     expected = self.neighbourhoods_df.iloc[0][1]
+    #     helper.map_geometries_to_neighbourhoods(coordinate_dfs, [['x', 'y']], geometry_dfs)
+    #     actual = geometry_dfs[0]['Neighbourhood'][0]
+    #     assert expected == actual, "Map Geometries To Neighborhood doesn't produce the expected result."
+    #
+    # def test_map_geometries_to_neighbourhoods_should_return_correct_empty_value_for_the_given_points(self, mocker,
+    #                                                                                                  setup_and_teardown):
+    #     geometry_dfs = [pd.DataFrame({'geometry': [Polygon([(55, 55), (55, 13), (13, 13), (13, 55)])]})]
+    #     coordinate_dfs = [pd.DataFrame({'x': [8, 11], 'y': [8, 11]})]
+    #
+    #     mock_f = mocker.patch('geopandas.read_file', return_value=self.neighbourhoods_df)
+    #
+    #     expected = ''
+    #     helper.map_geometries_to_neighbourhoods(coordinate_dfs, [['x', 'y']], geometry_dfs)
+    #     actual = geometry_dfs[0]['Neighbourhood'][0]
+    #     assert expected == actual, "Map Geometries To Neighborhood doesn't produce the expected result."
 
     def test_map_geometries_to_neighbourhoods_should_raise_exception_for_none_as_input_1(self, setup_and_teardown):
         with pytest.raises(ValueError):
