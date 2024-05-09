@@ -42,6 +42,14 @@ configure_env = { callable = "src.main:download_and_preprocess_data", extras = [
 preprocess_data = { callable = "src.main:preprocess_downloaded_raw_data", extras = ["all"] }
 sync_model = { callable = "src.main:train_model_on_new_data", extras = ["all"] }
 
+[tool.pytest.ini_options]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+    # note the use of single quote below to denote "raw" strings in TOML
+    'ignore:function ham\(\) is deprecated:DeprecationWarning',
+]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
