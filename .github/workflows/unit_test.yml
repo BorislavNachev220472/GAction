@@ -58,6 +58,6 @@ jobs:
           git config user.name "Borislav Nachev"
           git config user.email "220472@buas.nl"
           git add .
-          git add htmlcov/index.html 
+          git add htmlcov/index.html -f
           git commit -m "auto commit"
           git push
