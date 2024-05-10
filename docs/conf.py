@@ -7,11 +7,11 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'NPEC'
-copyright = '2024, asd'
-author = 'asd'
+copyright = '2024, BUas'
+author = 'BUas'
 
-version = '1.9'
-release = '1.9'
+version = '1.0'
+release = '1.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
