@@ -81,6 +81,7 @@ jobs:
           poetry run sphinx-quickstart docs --quiet -p NPEC -a BUas -v 1.0 -d html_theme="sphinx_rtd_theme"
           poetry run sphinx-apidoc -o docs src/
           cd docs
+          poetry run pip install sphinx_rtd_theme
           poetry run make html
       - name: update changes
         run: |
