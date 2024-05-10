@@ -73,12 +73,7 @@ jobs:
           source .venv/bin/activate
           coverage run -m pytest && coverage html
       - name: Generate docs
-        run: |
-          poetry run sphinx-apidoc -o docs src/
-          cd docs
-          poetry run pip install sphinx_rtd_theme
-          ls
-          make html
+        run: mkdocs build
       - name: update changes
         run: |
           git config user.name "Borislav Nachev"
