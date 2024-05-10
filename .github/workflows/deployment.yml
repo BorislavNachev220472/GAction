@@ -72,7 +72,9 @@ jobs:
         run: |
           source .venv/bin/activate
           coverage run -m pytest && coverage html
-      - uses: cascode-labs/build-sphinx-action/action.yml@v0.2.3
+
+      - name: Build sphinx docs
+        uses: cascode-labs/build-sphinx-action@v0.2.3
       - name: update changes
         run: |
           git config user.name "Borislav Nachev"
