@@ -74,7 +74,7 @@ jobs:
           coverage run -m pytest && coverage html
       - name: Generate docs
         run: |
-          poetry run sphinx-quickstart docs -y
+          poetry run sphinx-quickstart docs --quiet -p NPEC -a asd -v 1.9
           poetry run sphinx-build -M html docs/src/ docs/build/
       - name: update changes
         run: |
