@@ -83,14 +83,14 @@ jobs:
           cd docs
           poetry run pip install sphinx-rtd-theme
           poetry run make html
-      - name: update changes
-        run: |
-          git config user.name "Borislav Nachev"
-          git config user.email "220472@buas.nl"
-          git add .
-          git add htmlcov/index.html -f
-          git commit -m "auto commit"
-          git push
+#      - name: update changes
+#        run: |
+#          git config user.name "Borislav Nachev"
+#          git config user.email "220472@buas.nl"
+#          git add .
+#          git add htmlcov/index.html -f
+#          git commit -m "auto commit"
+#          git push
 
   deploy:
     needs: test
