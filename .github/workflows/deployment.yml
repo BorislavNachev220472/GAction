@@ -72,7 +72,12 @@ jobs:
         run: |
           source .venv/bin/activate
           coverage run -m pytest && coverage html
-
+      - name: Generate docs
+        run: |
+          poetry run sphinx-apidoc -o docs src/
+          cd docs
+          poetry run pip install sphinx_rtd_theme
+          ls
       - name: Build sphinx docs
         uses: cascode-labs/build-sphinx-action@v0.2.3
       - name: update changes
