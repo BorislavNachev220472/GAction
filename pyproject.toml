@@ -34,7 +34,7 @@ streamlit-option-menu = "^0.3.6"
 streamlit-extras = "^0.2.7"
 leafmap = "^0.21.3"
 mkdocs = "^1.2.0"
-sphinx-autobuild = "2024.4.16"
+sphinx_rtd_theme = "2.0.0"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
