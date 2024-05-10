@@ -78,10 +78,10 @@ jobs:
           rm -r docs
       - name: Generate docs
         run: |
-          poetry run sphinx-quickstart docs --quiet -p NPEC -a BUas -v 1.0 -t sphinx_rtd_theme
+          poetry run sphinx-quickstart docs --quiet -p NPEC -a BUas -v 1.0 --sep
           poetry run sphinx-apidoc -o docs src/
           cd docs
-          poetry run pip install sphinx_rtd_theme
+          poetry run pip install sphinx-rtd-theme
           poetry run make html
       - name: update changes
         run: |
