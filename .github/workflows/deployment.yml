@@ -23,6 +23,7 @@ concurrency:
 
 jobs:
   PoetrySetup:
+    environment: production
     runs-on: ubuntu-latest
     steps:
       #----------------------------------------------
@@ -70,6 +71,7 @@ jobs:
       #----------------------------------------------
   GenerateCoverageReport:
     needs: PoetrySetup
+    environment: production
     runs-on: ubuntu-latest
     steps:
       - name: Run tests
@@ -78,6 +80,7 @@ jobs:
           coverage run -m pytest && coverage html
   GenerateDocumentation:
     needs: PoetrySetup
+    environment: production
     runs-on: ubuntu-latest
     steps:
       - name: Refresh docs
