@@ -1,4 +1,4 @@
-name: Push Event Unit Test and Github Pages Workflow
+name: NPEC pipeline
 
 on:
   # Runs on pushes targeting the default branch
@@ -22,7 +22,7 @@ concurrency:
 
 
 jobs:
-  test:
+  PoetrySetup:
     runs-on: ubuntu-latest
     steps:
       #----------------------------------------------
@@ -68,10 +68,18 @@ jobs:
       #----------------------------------------------
       #              run test suite
       #----------------------------------------------
+  GenerateCoverageReport:
+    needs: PoetrySetup
+    runs-on: ubuntu-latest
+    steps:
       - name: Run tests
         run: |
           source .venv/bin/activate
           coverage run -m pytest && coverage html
+  GenerateDocumentation:
+    needs: PoetrySetup
+    runs-on: ubuntu-latest
+    steps:
       - name: Refresh docs
         if : ${{ hashFiles('docs/') != '' }}
         run:
@@ -83,17 +91,20 @@ jobs:
           cd docs
           poetry run pip install sphinx-rtd-theme
           poetry run make html
-#      - name: update changes
-#        run: |
-#          git config user.name "Borislav Nachev"
-#          git config user.email "220472@buas.nl"
-#          git add .
-#          git add htmlcov/index.html -f
-#          git commit -m "auto commit"
-#          git push
-
-  deploy:
-    needs: test
+  CommitGenerated:
+    needs: [GenerateCoverageReport, GenerateDocumentation]
+    runs-on: ubuntu-latest
+    steps:
+      - name: update changes
+        run: |
+          git config user.name "Borislav Nachev"
+          git config user.email "220472@buas.nl"
+          git add .
+          git add htmlcov/index.html -f
+          git commit -m "auto commit"
+          git push
+  DeployHtml:
+    needs: CommitGenerated
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
