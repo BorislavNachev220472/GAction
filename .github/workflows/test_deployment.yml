@@ -1,0 +1,93 @@
+name: Test Environment Check
+
+on:
+  push:
+    branches: [ "main", "documentation" ]
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  PoetrySetup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up python
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+      - name: Install project
+        run: poetry install --no-interaction
+      - name: Build the Docker image
+        run: |
+          poetry export --without-hashes --format=requirements.txt > requirements.txt
+          docker-compose build
+      - name: Export Docker Image
+        run: |
+          docker save --output temp_image.tar super_plant_phenotyper3000:latest
+          ls
+
+      - name: Refresh docs
+        if: ${{ hashFiles('docs/') != '' }}
+        run:
+          docker run --name super_plant_phenotyper3000 -d super_plant_phenotyper3000:latest
+          docker exec -i super_plant_phenotyper3000 bash
+          rm -r docs
+      - name: Generate docs
+        run: |
+          sphinx-quickstart docs --quiet -p NPEC -a BUas -v 1.0 -t config/
+          sphinx-apidoc -o docs src/
+          pip install sphinx-rtd-theme
+          cd docs
+          make html
+      - name: update changes
+        run: |
+          git config user.name "Borislav Nachev"
+          git config user.email "220472@buas.nl"
+          git commit -m "documentation auto commit" --docs
+          git push -u origin documentation
+
+  DeployHtml:
+    needs: GenerateDocs
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload entire repository
+          path: './docs/_build/'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

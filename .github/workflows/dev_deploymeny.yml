@@ -1,4 +1,4 @@
-name: NPEC pipeline
+name: Unit Test Check
 
 on:
   pull_request:
