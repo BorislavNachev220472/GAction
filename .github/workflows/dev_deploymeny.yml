@@ -32,6 +32,7 @@ jobs:
           pip install sqlalchemy
           pip install pandas
           pip install geopandas
+          pip install matplotlib
       - name: Run tests
         run: |
           coverage run -m pytest && coverage xml coverage.xml
