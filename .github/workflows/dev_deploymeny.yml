@@ -9,11 +9,12 @@ on:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: write-all
+  contents: write
 
 jobs:
   PoetrySetup:
     environment: production
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
