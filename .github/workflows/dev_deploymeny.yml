@@ -29,6 +29,7 @@ jobs:
         run: |
           pip install coverage
           pip install pytest
+          pip install sqlalchemy
       - name: Run tests
         run: |
           coverage run -m pytest && coverage xml coverage.xml
