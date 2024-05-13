@@ -66,14 +66,13 @@ jobs:
         run: |
           git config user.name "Borislav Nachev"
           git config user.email "220472@buas.nl"
-          git fetch
           git add .
-          git stash
-          git switch documentation
-          git stash main
           git commit -m "documentation auto commit"
-          git stash push
-
+      - name: Push changes to source branch
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: documentation
 
   DeployHtml:
     needs: PoetrySetup
