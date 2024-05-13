@@ -20,6 +20,8 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
+env:
+  MIN_COVERAGE_REQUIRED: 70
 
 jobs:
   DockerSetup:
@@ -98,7 +100,11 @@ jobs:
       - name: Run Unit Tests
         run: |
           source .venv/bin/activate
-          coverage run -m pytest && coverage html
+          coverage run -m pytest unittest discover
+      - name: Github Action to retrieve coverage percentage
+        id: total-coverage
+        run: |
+          coverage json -q -o /dev/stdout | python -c 'import sys, json; perc_cov = json.load(sys.stdin)["totals"]["percent_covered"]; is_covered = perc_cov >= '$MIN_COVERAGE_REQUIRED'; print("Coverage is: ", perc_cov); sys.exit(not is_covered)'
 
   GenerateDocs:
     needs: UnitTest
