@@ -22,7 +22,7 @@ concurrency:
 
 
 jobs:
-  PoetrySetup:
+  DockerSetup:
     runs-on: ubuntu-latest
     steps:
       #----------------------------------------------
@@ -81,32 +81,9 @@ jobs:
         with:
           name: docker_img
           path: temp_image.tar
-#      - name: Run tests
-#        run: |
-#          source .venv/bin/activate
-#          coverage run -m pytest && coverage html
-#      - name: Refresh docs
-#        if: ${{ hashFiles('docs/') != '' }}
-#        run:
-#          rm -r docs
-#      - name: Generate docs
-#        run: |
-#          poetry run sphinx-quickstart docs --quiet -p NPEC -a BUas -v 1.0 -t config/
-#          poetry run sphinx-apidoc -o docs src/
-#          cd docs
-#          poetry run pip install sphinx-rtd-theme
-#          poetry run make html
-#      - name: update changes
-#        run: |
-#          git config user.name "Borislav Nachev"
-#          git config user.email "220472@buas.nl"
-#          git add .
-#          git add htmlcov/index.html -f
-#          git commit -m "auto commit"
-#          git push
 
-  use:
-    needs: PoetrySetup
+  UnitTest:
+    needs: DockerSetup
     runs-on: ubuntu-latest
     steps:
       - name: Download math result for job 1
@@ -118,9 +95,46 @@ jobs:
           ls
           docker load --input temp_image.tar
           docker image ls -a
+      - name: Run Unit Tests
+        run: |
+          source .venv/bin/activate
+          coverage run -m pytest && coverage html
+
+  GenerateDocs:
+    needs: UnitTest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download math result for job 1
+        uses: actions/download-artifact@v4
+        with:
+          name: docker_img
+      - name: Load image
+        run: |
+          ls
+          docker load --input temp_image.tar
+          docker image ls -a
+      - name: Refresh docs
+        if: ${{ hashFiles('docs/') != '' }}
+        run:
+          rm -r docs
+      - name: Generate docs
+        run: |
+          poetry run sphinx-quickstart docs --quiet -p NPEC -a BUas -v 1.0 -t config/
+          poetry run sphinx-apidoc -o docs src/
+          cd docs
+          poetry run pip install sphinx-rtd-theme
+          poetry run make html
+  #      - name: update changes
+  #        run: |
+  #          git config user.name "Borislav Nachev"
+  #          git config user.email "220472@buas.nl"
+  #          git add .
+  #          git add htmlcov/index.html -f
+  #          git commit -m "auto commit"
+  #          git push
 
   DeployHtml:
-    needs: PoetrySetup
+    needs: GenerateDocs
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
