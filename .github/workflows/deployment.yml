@@ -102,7 +102,8 @@ jobs:
         run: |
           docker run --name super_plant_phenotyper3000 -d super_plant_phenotyper3000:latest
           docker exec -d super_plant_phenotyper3000 coverage xml ./coverage.xml
-          docker cp super_plant_phenotyper3000:/coverage.xml .
+          docker exec -d super_plant_phenotyper3000 ls
+          docker cp super_plant_phenotyper3000:coverage.xml .
       - name: Get Cover
         uses: orgoro/coverage@v3.1
         with:
