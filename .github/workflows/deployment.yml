@@ -107,8 +107,8 @@ jobs:
       - name: Load image
         run: |
           ls
-          docker load --input temp_image.tar
-          docker image ls -a   
+#          docker load --input temp_image.tar
+#          docker image ls -a
 
   DeployHtml:
     needs: PoetrySetup
