@@ -93,7 +93,7 @@ jobs:
           git push
 
   DeployHtml:
-    needs: CommitGenerated
+    needs: PoetrySetup
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
