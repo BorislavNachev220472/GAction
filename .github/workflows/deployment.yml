@@ -85,9 +85,12 @@ jobs:
         with:
           name: shared-venv
           path: .venv
+      - name: Run tests
+        run: |
+          source .venv/bin/activate
       - name: Build the Docker image
         run: |
-          poetry export --without-hashes --format=requirements.txt > requirements.txt
+#          poetry export --without-hashes --format=requirements.txt > requirements.txt
           docker-compose build
       - name: Export Docker Image
         run: |
