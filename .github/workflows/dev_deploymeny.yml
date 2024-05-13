@@ -14,17 +14,7 @@ permissions:
   id-token: write
 
 jobs:
-  build: # make sure build/ci work properly
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - run: |
-          npm install
-      - run: |
-          npm run all
-
   PoetrySetup:
-    needs: build
     environment: production
     runs-on: ubuntu-latest
     steps:
@@ -75,8 +65,10 @@ jobs:
         run: |
           source .venv/bin/activate
           coverage run -m pytest && coverage xml
-      - name: Get Cover
-        uses: orgoro/coverage@v3.1
+      - name: Generate report
+      - uses: ./
         with:
-          coverageFile: ./coverage.xml
           token: ${{ secrets.GITHUB_TOKEN }}
+          thresholdNew: 0.8
+          thresholdModified: 0.0
+          coverageFile: coverage.xml
