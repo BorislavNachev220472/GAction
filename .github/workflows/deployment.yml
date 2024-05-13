@@ -123,14 +123,18 @@ jobs:
       - name: Refresh docs
         if: ${{ hashFiles('docs/') != '' }}
         run:
+          docker run --name super_plant_phenotyper3000 -d super_plant_phenotyper3000:latest
+          docker exec -i super_plant_phenotyper3000 bash
           rm -r docs
       - name: Generate docs
         run: |
-          poetry run sphinx-quickstart docs --quiet -p NPEC -a BUas -v 1.0 -t config/
-          poetry run sphinx-apidoc -o docs src/
+          docker run --name super_plant_phenotyper3000 -d super_plant_phenotyper3000:latest
+          docker exec -i super_plant_phenotyper3000 bash
+          sphinx-quickstart docs --quiet -p NPEC -a BUas -v 1.0 -t config/
+          sphinx-apidoc -o docs src/
           cd docs
-          poetry run pip install sphinx-rtd-theme
-          poetry run make html
+          pip install sphinx-rtd-theme
+          make html
   #      - name: update changes
   #        run: |
   #          git config user.name "Borislav Nachev"
