@@ -43,14 +43,14 @@ jobs:
         run: poetry install --no-interaction --no-root
       - name: Install project
         run: poetry install --no-interaction
-      - name: Build the Docker image
-        run: |
-          poetry export --without-hashes --format=requirements.txt > requirements.txt
-          docker-compose build
-      - name: Export Docker Image
-        run: |
-          docker save --output temp_image.tar super_plant_phenotyper3000:latest
-          ls
+#      - name: Build the Docker image
+#        run: |
+#          poetry export --without-hashes --format=requirements.txt > requirements.txt
+#          docker-compose build
+#      - name: Export Docker Image
+#        run: |
+#          docker save --output temp_image.tar super_plant_phenotyper3000:latest
+#          ls
 
       - name: Refresh docs
         if: ${{ hashFiles('docs/') != '' }}
@@ -68,7 +68,7 @@ jobs:
           git config user.name "Borislav Nachev"
           git config user.email "220472@buas.nl"
           git commit -m "documentation auto commit" -- docs
-          git push -u origin documentation
+          git push -u documentation
 
 
   DeployHtml:
