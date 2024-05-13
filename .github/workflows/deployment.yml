@@ -72,12 +72,9 @@ jobs:
         run: |
           poetry export --without-hashes --format=requirements.txt > requirements.txt
           docker-compose build
-      - name: Build and export
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          tags: myimage:latest
-          outputs: type=docker,dest=/tmp/myimage.tar
+      - name: Export Docker Image
+        run:
+          docker save --output temp_image.tar super_plant_phenotyper3000:latest
       - name: Run tests
         run: |
           source .venv/bin/activate
