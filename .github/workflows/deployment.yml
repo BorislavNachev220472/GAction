@@ -101,11 +101,12 @@ jobs:
         run: |
           docker run --name super_plant_phenotyper3000 -d super_plant_phenotyper3000:latest
           docker exec -i super_plant_phenotyper3000 bash
-          python coverage run -m pytest unittest discover
+          pip list
+          coverage run -m pytest discover
       - name: Github Action to retrieve coverage percentage
         id: total-coverage
         run: |
-          python coverage json -q -o /dev/stdout | python -c 'import sys, json; perc_cov = json.load(sys.stdin)["totals"]["percent_covered"]; is_covered = perc_cov >= '$MIN_COVERAGE_REQUIRED'; print("Coverage is: ", perc_cov); sys.exit(not is_covered)'
+          coverage json -q -o /dev/stdout | python -c 'import sys, json; perc_cov = json.load(sys.stdin)["totals"]["percent_covered"]; is_covered = perc_cov >= '$MIN_COVERAGE_REQUIRED'; print("Coverage is: ", perc_cov); sys.exit(not is_covered)'
 
   GenerateDocs:
     needs: DockerSetup
@@ -130,11 +131,11 @@ jobs:
         run: |
           docker run --name super_plant_phenotyper3000 -d super_plant_phenotyper3000:latest
           docker exec -i super_plant_phenotyper3000 bash
-          python sphinx-quickstart docs --quiet -p NPEC -a BUas -v 1.0 -t config/
-          python sphinx-apidoc -o docs src/
+          sphinx-quickstart docs --quiet -p NPEC -a BUas -v 1.0 -t config/
+          sphinx-apidoc -o docs src/
           cd docs
           pip install sphinx-rtd-theme
-          python make html
+          make html
   #      - name: update changes
   #        run: |
   #          git config user.name "Borislav Nachev"
