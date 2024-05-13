@@ -68,7 +68,7 @@ jobs:
           git config user.email "220472@buas.nl"
           git fetch
           git commit -m "documentation auto commit" -- docs
-          git push origin documentation
+          git push origin/documentation
 
 
   DeployHtml:
