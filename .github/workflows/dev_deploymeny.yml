@@ -2,9 +2,7 @@
 # For more information see: https://github.com/MishaKav/pytest-coverage-comment/
 name: pytest-coverage-comment
 on:
-  pull_request:
-    branches:
-      - '*'
+  push:
 
 # https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs
 # `contents` is for permission to the contents of the repository.
