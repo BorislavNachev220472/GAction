@@ -90,7 +90,7 @@ jobs:
           git add .
           git add htmlcov/index.html -f
           git commit -m "auto commit"
-          git push
+          git push 
 
   DeployHtml:
     needs: PoetrySetup
