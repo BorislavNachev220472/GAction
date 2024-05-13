@@ -106,6 +106,7 @@ jobs:
       - name: Load image
         run: |
           ls
+          docker image ls
 #          docker load --input temp_image.tar
 #          docker image ls -a
 
