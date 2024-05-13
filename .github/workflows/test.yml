@@ -23,8 +23,17 @@ jobs:
       - name: Set up Poetry
         run: echo 'export PATH="$HOME/.poetry/bin:$PATH"' >> $GITHUB_ENV && source $GITHUB_ENV && poetry --version
 
-  use-poetry:
+  download-packages:
     needs: install-poetry
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Install dependencies from pyproject.toml
+        run: poetry install
+
+  use-poetry:
+    needs: download-packages
     runs-on: ubuntu-latest
     steps:
       - name: Restore Poetry cache
