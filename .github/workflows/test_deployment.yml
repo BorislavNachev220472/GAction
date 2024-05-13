@@ -67,8 +67,9 @@ jobs:
           git config user.name "Borislav Nachev"
           git config user.email "220472@buas.nl"
           git fetch
-          git commit -m "documentation auto commit" -- docs
-          git push origin/documentation
+          git add .
+          git commit -m "documentation auto commit"
+          git push -u origin documentation
 
 
   DeployHtml:
