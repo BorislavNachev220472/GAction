@@ -102,11 +102,12 @@ jobs:
 
   use:
     needs: PoetrySetup
+    runs-on: ubuntu-latest
     steps:
       - name: Load image
         run: |
           ls
-          docker image ls
+          docker image ls -a
 #          docker load --input temp_image.tar
 #          docker image ls -a
 
