@@ -27,19 +27,14 @@ jobs:
     needs: install-poetry
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Install dependencies from pyproject.toml
-        run: poetry install
-
-  use-poetry:
-    needs: download-packages
-    runs-on: ubuntu-latest
-    steps:
       - name: Restore Poetry cache
         uses: actions/cache@v2
         with:
           path: ~/.poetry
           key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Install dependencies from pyproject.toml
+        run: poetry install
 
       # Your steps here that use Poetry for dependency management or other tasks
