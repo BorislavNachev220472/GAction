@@ -101,10 +101,10 @@ jobs:
         id: total-coverage
         run: |
           docker run --name super_plant_phenotyper3000 -d super_plant_phenotyper3000:latest
-          docker exec -d super_plant_phenotyper3000 coverage run -m pytest discover -s tests 
-          docker exec -d super_plant_phenotyper3000 coverage xml -o custom_coverage.xml
-          docker exec -d super_plant_phenotyper3000 ls
-          docker cp super_plant_phenotyper3000:/custom_coverage.xml .
+          docker exec -d super_plant_phenotyper3000 bash
+          coverage run -m pytest discover -s tests 
+          coverage xml -o custom_coverage.xml
+          ls
       - name: Get Cover
         uses: orgoro/coverage@v3.1
         with:
