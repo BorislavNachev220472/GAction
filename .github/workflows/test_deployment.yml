@@ -69,6 +69,8 @@ jobs:
           git add .
           git commit -m "documentation auto commit"
           git pull
+          git fetch
+          git rebase origin/documentation
       - name: Push changes to source branch
         uses: ad-m/github-push-action@master
         with:
