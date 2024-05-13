@@ -55,8 +55,6 @@ jobs:
       - name: Refresh docs
         if: ${{ hashFiles('docs/') != '' }}
         run:
-          docker run --name super_plant_phenotyper3000 -d super_plant_phenotyper3000:latest
-          docker exec -i super_plant_phenotyper3000 bash
           rm -r docs
       - name: Generate docs
         run: |
