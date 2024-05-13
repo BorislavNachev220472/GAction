@@ -130,11 +130,11 @@ jobs:
         run: |
           docker run --name super_plant_phenotyper3000 -d super_plant_phenotyper3000:latest
           docker exec -i super_plant_phenotyper3000 bash
-          sphinx-quickstart docs --quiet -p NPEC -a BUas -v 1.0 -t config/
-          sphinx-apidoc -o docs src/
+          python sphinx-quickstart docs --quiet -p NPEC -a BUas -v 1.0 -t config/
+          python sphinx-apidoc -o docs src/
           cd docs
           pip install sphinx-rtd-theme
-          make html
+          python make html
   #      - name: update changes
   #        run: |
   #          git config user.name "Borislav Nachev"
