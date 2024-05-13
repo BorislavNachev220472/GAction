@@ -24,7 +24,7 @@ env:
   MIN_COVERAGE_REQUIRED: 70
 
 jobs:
-  DockerSetup:
+  PoetrySetup:
     runs-on: ubuntu-latest
     steps:
       #----------------------------------------------
@@ -70,6 +70,21 @@ jobs:
       #----------------------------------------------
       #              run test suite
       #----------------------------------------------
+      - name: Upload workspace as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: shared-venv
+          path: .venv
+
+  DockerSetup:
+    needs: PoetrySetup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: shared-venv
+          path: .venv
       - name: Build the Docker image
         run: |
           poetry export --without-hashes --format=requirements.txt > requirements.txt
@@ -98,13 +113,9 @@ jobs:
           docker load --input temp_image.tar
           docker image ls -a
       - name: Run Unit Tests
-        id: total-coverage
         run: |
-          docker run --name super_plant_phenotyper3000 -d super_plant_phenotyper3000:latest
-          docker exec -d super_plant_phenotyper3000 bash
           coverage run -m pytest discover -s tests 
           coverage xml -o custom_coverage.xml
-          ls
       - name: Get Cover
         uses: orgoro/coverage@v3.1
         with:
