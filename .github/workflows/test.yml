@@ -1,4 +1,4 @@
-name: Share Poetry Installation
+name: Install Poetry and Download Packages
 
 on:
   push:
@@ -9,32 +9,18 @@ jobs:
   install-poetry:
     runs-on: ubuntu-latest
     steps:
-      - name: Cache Poetry
-        uses: actions/cache@v2
-        with:
-          path: ~/.poetry
-          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-poetry-
       - name: Install Poetry
-        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
-      - name: Set up Poetry
-        run: echo 'export PATH="$HOME/.poetry/bin:$PATH"' >> $GITHUB_ENV && source $GITHUB_ENV && poetry --version
+          export PATH="$HOME/.poetry/bin:$PATH"
+      - name: Check Poetry version
+        run: poetry --version
 
   download-packages:
     needs: install-poetry
     runs-on: ubuntu-latest
     steps:
-      - name: Restore Poetry cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.poetry
-          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Install dependencies from pyproject.toml
         run: poetry install
-
-      # Your steps here that use Poetry for dependency management or other tasks
