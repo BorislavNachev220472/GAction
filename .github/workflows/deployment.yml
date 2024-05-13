@@ -101,7 +101,7 @@ jobs:
         run: |
           docker run --name super_plant_phenotyper3000 -d super_plant_phenotyper3000:latest
           docker exec -i super_plant_phenotyper3000 bash
-          pip list
+          ls
           coverage run -m pytest discover
       - name: Github Action to retrieve coverage percentage
         id: total-coverage
