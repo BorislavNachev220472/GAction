@@ -1,40 +1,24 @@
-# This workflow will install dependencies, create coverage tests and run Pytest Coverage Comment
-# For more information see: https://github.com/MishaKav/pytest-coverage-comment/
-name: pytest-coverage-comment
+name: pytest-coverage-commentator
 on:
   push:
-
-# https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs
-# `contents` is for permission to the contents of the repository.
-# `pull-requests` is for permission to pull request
-permissions:
-  contents: write
-  checks: write
-  pull-requests: write
-
+    branches:
+      - '*'
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install flake8 pytest pytest-cov
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-      - name: Build coverage file
-        run: |
-          pytest --junitxml=pytest.xml --cov-report=xml --cov=app tests/ | tee pytest-coverage.txt
-
-      - name: Pytest coverage comment
-        uses: MishaKav/pytest-coverage-comment@main
-        with:
-          pytest-coverage-path: /pytest-coverage.txt
-          junitxml-path: ./pytest.xml
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest pytest-cov
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Build coverage file
+      run: |
+        pytest --cache-clear --cov=app test/ > pytest-coverage.txt
+    - name: Comment coverage
+      uses: coroo/pytest-coverage-commentator@v1.0.2
