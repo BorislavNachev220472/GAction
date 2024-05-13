@@ -86,12 +86,10 @@ jobs:
           name: shared-venv
           path: .venv
       - name: Run tests
-        run: |
-          source .venv/bin/activate
+        run: source .venv/bin/activate
       - name: Build the Docker image
-        run: |
+        run: docker-compose build
 #          poetry export --without-hashes --format=requirements.txt > requirements.txt
-          docker-compose build
       - name: Export Docker Image
         run: |
           docker save --output temp_image.tar super_plant_phenotyper3000:latest
