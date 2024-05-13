@@ -104,6 +104,7 @@ jobs:
 
   use:
     needs: PoetrySetup
+    runs-on: ubuntu-latest
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v3
