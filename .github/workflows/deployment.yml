@@ -102,7 +102,6 @@ jobs:
 
   use:
     needs: PoetrySetup
-    runs-on: ubuntu-latest
     steps:
       - name: Load image
         run: |
