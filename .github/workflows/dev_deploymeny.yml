@@ -14,7 +14,17 @@ permissions:
   id-token: write
 
 jobs:
+  build: # make sure build/ci work properly
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          npm install
+      - run: |
+          npm run all
+
   PoetrySetup:
+    needs: build
     environment: production
     runs-on: ubuntu-latest
     steps:
@@ -65,12 +75,6 @@ jobs:
         run: |
           source .venv/bin/activate
           coverage run -m pytest && coverage xml
-      - name: Install packages
-      - uses: actions/checkout@v3
-      - run: |
-          npm install
-      - run: |
-          npm run all
       - name: Get Cover
         uses: orgoro/coverage@v3.1
         with:
