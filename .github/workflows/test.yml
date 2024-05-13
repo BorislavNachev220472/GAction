@@ -1,26 +1,26 @@
-name: Install Poetry and Download Packages
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  install-poetry:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          export PATH="$HOME/.poetry/bin:$PATH"
-      - name: Check Poetry version
-        run: poetry --version
-
-  download-packages:
-    needs: install-poetry
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Install dependencies from pyproject.toml
-        run: poetry install
+#name: Install Poetry and Download Packages
+#
+#on:
+#  push:
+#    branches:
+#      - main
+#
+#jobs:
+#  install-poetry:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Install Poetry
+#        run: |
+#          curl -sSL https://install.python-poetry.org | python3 -
+#          export PATH="$HOME/.poetry/bin:$PATH"
+#      - name: Check Poetry version
+#        run: poetry --version
+#
+#  download-packages:
+#    needs: install-poetry
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v2
+#      - name: Install dependencies from pyproject.toml
+#        run: poetry install
