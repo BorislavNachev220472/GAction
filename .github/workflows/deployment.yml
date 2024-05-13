@@ -76,6 +76,11 @@ jobs:
         run: |
           docker save --output temp_image.tar super_plant_phenotyper3000:latest
           ls
+      - name: Upload math result for job 1
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker_img
+          path: temp_image.tar
 #      - name: Run tests
 #        run: |
 #          source .venv/bin/activate
@@ -104,12 +109,15 @@ jobs:
     needs: PoetrySetup
     runs-on: ubuntu-latest
     steps:
+      - name: Download math result for job 1
+        uses: actions/download-artifact@v4
+        with:
+          name: docker_img
       - name: Load image
         run: |
           ls
+          docker load --input temp_image.tar
           docker image ls -a
-#          docker load --input temp_image.tar
-#          docker image ls -a
 
   DeployHtml:
     needs: PoetrySetup
