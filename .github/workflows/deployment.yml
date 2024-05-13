@@ -101,7 +101,14 @@ jobs:
         id: total-coverage
         run: |
           docker run --name super_plant_phenotyper3000 -d super_plant_phenotyper3000:latest
-          docker exec -d super_plant_phenotyper3000 coverage run -m pytest tests && coverage json -q -o /dev/stdout | python -c 'import sys, json; perc_cov = json.load(sys.stdin)["totals"]["percent_covered"]; is_covered = perc_cov >= '$MIN_COVERAGE_REQUIRED'; print("Coverage is: ", perc_cov); sys.exit(not is_covered)'
+          docker exec -d super_plant_phenotyper3000 coverage xml ./coverage.xml
+          docker cp super_plant_phenotyper3000:/coverage.xml .
+      - name: Get Cover
+        uses: orgoro/coverage@v3.1
+        with:
+          coverageFile: ./coverage.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+  #          docker exec -d super_plant_phenotyper3000 coverage run -m pytest tests && coverage json -q -o /dev/stdout | python -c 'import sys, json; perc_cov = json.load(sys.stdin)["totals"]["percent_covered"]; is_covered = perc_cov >= '$MIN_COVERAGE_REQUIRED'; print("Coverage is: ", perc_cov); sys.exit(not is_covered)'
 
   GenerateDocs:
     needs: DockerSetup
@@ -129,7 +136,7 @@ jobs:
           docker exec -d super_plant_phenotyper3000 sphinx-quickstart docs --quiet -p NPEC -a BUas -v 1.0 -t config/
           docker exec -d super_plant_phenotyper3000 sphinx-apidoc -o docs src/
           docker exec -d super_plant_phenotyper3000 pip install sphinx-rtd-theme
-          docker exec -d super_plant_phenotyper3000 cd docs && make html
+          docker exec -d super_plant_phenotyper3000 -c "cd docs && make html"
   #      - name: update changes
   #        run: |
   #          git config user.name "Borislav Nachev"
