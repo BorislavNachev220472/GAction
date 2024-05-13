@@ -69,11 +69,6 @@ jobs:
       #----------------------------------------------
       #              run test suite
       #----------------------------------------------
-  GenerateCoverageReport:
-    needs: PoetrySetup
-    environment: production
-    runs-on: ubuntu-latest
-    steps:
       - name: Run tests
         run: |
           source .venv/bin/activate
@@ -97,7 +92,7 @@ jobs:
           git add .
           git add htmlcov/index.html -f
           git commit -m "auto commit"
-          git push
+          git push    
 
   DeployHtml:
     needs: CommitGenerated
