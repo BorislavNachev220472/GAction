@@ -30,6 +30,7 @@ jobs:
           pip install coverage
           pip install pytest
           pip install sqlalchemy
+          pip install pandas
       - name: Run tests
         run: |
           coverage run -m pytest && coverage xml coverage.xml
