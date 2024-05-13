@@ -103,7 +103,6 @@ jobs:
           git push 
 
   use:
-  runs-on: ubuntu-latest
   needs: PoetrySetup
   steps:
     - name: Download artifact
