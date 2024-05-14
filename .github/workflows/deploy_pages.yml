@@ -22,10 +22,10 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Check out repository
         uses: actions/checkout@v4
-        with:
-          path: documentation
+      - name: Checkout
+        run: git checkout docs --
       - name: check
         run: ls
       - name: Setup Pages
@@ -34,7 +34,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
-          name: docs
+          name: documentation
           path: './docs/_build/html/'
       - name: Deploy to GitHub Pages
         id: deployment
