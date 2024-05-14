@@ -2,7 +2,8 @@ name: Test Environment Check
 
 on:
   push:
-    branches: [ "main", "docs" ]
+    branches:
+      test
 
   workflow_dispatch:
 
@@ -44,21 +45,15 @@ jobs:
       - name: Install project
         run: poetry install --no-interaction
 
-      #      - name: Push to PyPl
-      #        run: |
-      #          poetry config pypi-token.pypi ${{ secrets.PYPL }}
-      #          poetry build
-      #          poetry publish
-
-      #      - name: Build the Docker image
-      #        run: |
-      #          poetry export --without-hashes --format=requirements.txt > requirements.txt
-      #          docker-compose build
-      #      - name: Push Docker Image
-      #        run: |
-      #          docker tag super_plant_phenotyper3000:latest plantphenotyper/plant_phenotyper_test:latest
-      #          docker login -u plantphenotyper -p ${{ secrets.DOCKER }}
-      #          docker push plantphenotyper/plant_phenotyper_test:latest
+      - name: Build the Docker image
+        run: |
+          poetry export --without-hashes --format=requirements.txt > requirements.txt
+          docker-compose build
+      - name: Push Docker Image
+        run: |
+          docker tag super_plant_phenotyper3000:latest plantphenotyper/plant_phenotyper_test:test
+          docker login -u plantphenotyper -p ${{ secrets.DOCKER }}
+          docker push plantphenotyper/plant_phenotyper_test:test
 
       - name: Refresh docs
         if: ${{ hashFiles('docs/') != '' }}
@@ -67,7 +62,7 @@ jobs:
       - name: Generate docs
         run: |
           poetry run sphinx-quickstart docs --quiet -p NPEC -a BUas -v 1.0 -t config/
-          poetry run sphinx-apidoc -o docs testasddsa/
+          poetry run sphinx-apidoc -o docs pyphenotyper/
           pip install sphinx-rtd-theme
           cd docs
           poetry run make html
@@ -77,17 +72,17 @@ jobs:
           git config user.email "220472@buas.nl"
           git fetch
           git add .
-          git commit -m "documentation auto commit"
-          git checkout documentation --
+          git commit -m "test documentation auto commit"
+          git checkout test_documentation --
           git merge main -Xtheirs --allow-unrelated-histories
           poetry run python ./config/keep_documentation.py
-          git commit -m "documentation auto commit"
+          git commit -m "test documentation auto commit"
 
       - name: Push changes to source branch
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: documentation
+          branch: test_documentation
 
   DeployPages:
     needs: PoetrySetup
@@ -101,7 +96,7 @@ jobs:
       - name: Checkout
         run: |
           git fetch
-          git checkout documentation --
+          git checkout test_documentation --
       - name: check
         run: ls
       - name: Setup Pages
