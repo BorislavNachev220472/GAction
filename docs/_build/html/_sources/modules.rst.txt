@@ -1,7 +1,7 @@
-src
-===
+testasddsa
+==========
 
 .. toctree::
    :maxdepth: 4
 
-   src
+   main
