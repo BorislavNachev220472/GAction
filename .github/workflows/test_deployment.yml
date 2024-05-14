@@ -70,7 +70,7 @@ jobs:
           git add .
           git checkout documentation
           git commit -m "documentation auto commit"
-          git stash
+          git stash 
 
       - name: Push changes to source branch
         uses: ad-m/github-push-action@master
