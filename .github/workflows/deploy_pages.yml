@@ -23,9 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          path: documentation
+        run: git checkout docs --
       - name: check
         run: ls
       - name: Setup Pages
@@ -34,7 +32,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
-          name: docs
+          name: documentation
           path: './docs/_build/html/'
       - name: Deploy to GitHub Pages
         id: deployment
