@@ -1,5 +1,5 @@
 .. NPEC documentation master file, created by
-   sphinx-quickstart on Tue May 14 12:25:47 2024.
+   sphinx-quickstart on Tue May 14 12:29:39 2024.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
