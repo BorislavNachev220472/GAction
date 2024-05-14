@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.utils &mdash; NPEC 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=f2a433a1"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            NPEC
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">NPEC</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">text</span><span class="p">,</span> <span class="n">MetaData</span><span class="p">,</span> <span class="n">Table</span><span class="p">,</span> <span class="n">select</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">.decorators</span> <span class="kn">import</span> <span class="n">debounced</span><span class="p">,</span> <span class="n">injectable</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">from</span> <span class="nn">shapely</span> <span class="kn">import</span> <span class="n">wkt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">plotly.express</span> <span class="k">as</span> <span class="nn">px</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">topojson</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">src.constants</span> <span class="k">as</span> <span class="nn">constants</span>
+
+
+<div class="viewcode-block" id="read_tables">
+<a class="viewcode-back" href="../../src.utils.html#src.utils.read_tables">[docs]</a>
+<span class="k">def</span> <span class="nf">read_tables</span><span class="p">(</span><span class="n">engine</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads tables from the database and returns a dictionary.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        engine (sqlalchemy.engine.Engine): The SQLAlchemy database engine.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: A dictionary mapping table names to pandas DataFrames.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tables</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">MetaData</span><span class="p">()</span>
+    <span class="n">metadata</span><span class="o">.</span><span class="n">reflect</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+
+    <span class="n">table_names</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">table_name</span> <span class="ow">in</span> <span class="n">table_names</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_table</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="n">engine</span><span class="p">)</span>
+        <span class="n">tables</span><span class="p">[</span><span class="n">table_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span>
+
+    <span class="k">return</span> <span class="n">tables</span></div>
+
+
+
+<div class="viewcode-block" id="get_metadata">
+<a class="viewcode-back" href="../../src.utils.html#src.utils.get_metadata">[docs]</a>
+<span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="n">engine</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieves metadata from the database.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        engine (sqlalchemy.engine.Engine): The SQLAlchemy database engine.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        sqlalchemy.MetaData: The metadata object representing the database schema.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">MetaData</span><span class="p">()</span>
+    <span class="n">metadata</span><span class="o">.</span><span class="n">reflect</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">metadata</span></div>
+
+
+
+<span class="nd">@injectable</span>
+<span class="k">def</span> <span class="nf">table_reader</span><span class="p">(</span><span class="n">engine</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Injectable: Reads a specific table from the database.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        engine (sqlalchemy.engine.Engine): The SQLAlchemy database engine.</span>
+<span class="sd">        table_name (str): The name of the table to read.</span>
+<span class="sd">        **kwargs: Additional keyword arguments to pass to the `exec_query` function.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: A tuple containing the SQLAlchemy Table object representing the table schema and</span>
+<span class="sd">               a pandas DataFrame containing the table data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">get_metadata</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+    <span class="n">x_q</span> <span class="o">=</span> <span class="n">exec_query</span><span class="p">(</span><span class="n">engine</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="n">table</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">(</span><span class="n">el</span><span class="p">)</span>
+        <span class="n">records</span> <span class="o">=</span> <span class="n">x_q</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">el</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">records</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">table</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="check_connection">
+<a class="viewcode-back" href="../../src.utils.html#src.utils.check_connection">[docs]</a>
+<span class="nd">@debounced</span><span class="p">(</span><span class="n">sec</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">check_connection</span><span class="p">(</span><span class="n">engine</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    debounced: Checks the database connection every 30 seconds.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        engine (sqlalchemy.engine.Engine): The SQLAlchemy database engine.</span>
+<span class="sd">        desc (str, optional): An optional description to include in the success message.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">test_query</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="s2">&quot;SELECT 1&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">engine</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">test_query</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">scalar</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">desc</span> <span class="ow">or</span> <span class="s2">&quot;Connection successful!&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Connection failed!&quot;</span><span class="p">)</span>
+            <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+
+<span class="nd">@injectable</span>
+<span class="k">def</span> <span class="nf">exec_query</span><span class="p">(</span><span class="n">engine</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Injectable: Executes a database query.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        engine (sqlalchemy.engine.Engine): The SQLAlchemy database engine.</span>
+<span class="sd">        q (str): The query string to execute.</span>
+<span class="sd">        v (bool, optional): A boolean flag indicating whether to perform connection checking (default is True).</span>
+<span class="sd">        desc (str, optional): An optional description to include in the connection check success message.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: A list of records resulting from the query.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+        <span class="n">check_connection</span><span class="p">(</span><span class="n">engine</span><span class="p">,</span> <span class="n">desc</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">engine</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="n">q_res</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="n">q_res</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">res</span>
+
+
+<div class="viewcode-block" id="data_typing">
+<a class="viewcode-back" href="../../src.utils.html#src.utils.data_typing">[docs]</a>
+<span class="k">def</span> <span class="nf">data_typing</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">,</span>
+    <span class="n">integers</span><span class="o">=</span><span class="p">[],</span> <span class="n">floats</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">strings</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">categoricals</span><span class="o">=</span><span class="p">[],</span> <span class="n">dates</span><span class="o">=</span><span class="p">{},</span> <span class="n">only_years</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">only_months</span><span class="o">=</span><span class="p">[],</span> <span class="n">only_days</span><span class="o">=</span><span class="p">[]</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs data typing on a DataFrame.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        df (pandas.DataFrame): The pandas DataFrame to perform data typing on.</span>
+<span class="sd">        integers (list, optional): A list of column names to be typed as integers.</span>
+<span class="sd">        floats (list, optional): A list of column names to be typed as floats.</span>
+<span class="sd">        strings (list, optional): A list of column names to be typed as strings.</span>
+<span class="sd">        categoricals (list, optional): A list of column names to be typed as categoricals.</span>
+<span class="sd">        dates (dict, optional): A dictionary mapping date column names to their format strings (e.g., {&#39;date_column&#39;: &#39;%Y-%m-%d&#39;}).</span>
+<span class="sd">        only_years (list, optional): A list of date column names to extract only the year.</span>
+<span class="sd">        only_months (list, optional): A list of date column names to extract only the month.</span>
+<span class="sd">        only_days (list, optional): A list of date column names to extract only the day.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pandas.DataFrame: The modified DataFrame with the specified column types applied.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">integers</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">downcast</span><span class="o">=</span><span class="s1">&#39;integer&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">floats</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                <span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">),</span> <span class="n">downcast</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">categoricals</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">strings</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;string&#39;</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">dates</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="n">dates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">only_years</span><span class="p">:</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">to_period</span><span class="p">(</span><span class="s1">&#39;Y&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">only_months</span><span class="p">:</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">to_period</span><span class="p">(</span><span class="s1">&#39;M&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">only_days</span><span class="p">:</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">to_period</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<span class="nd">@injectable</span>
+<span class="k">def</span> <span class="nf">visualize_map</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">num_col</span><span class="p">,</span> <span class="n">cat_col</span><span class="p">,</span> <span class="n">cat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quantiles</span><span class="o">=</span><span class="p">[</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.98</span><span class="p">],</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">ext_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;^(?:\S+)*\.(\S+)$&#39;</span><span class="p">)</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">ext_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">ext</span> <span class="o">==</span> <span class="s1">&#39;csv&#39;</span><span class="p">:</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">gdf</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">wkt</span><span class="o">.</span><span class="n">loads</span><span class="p">)</span>
+        <span class="n">gdf_data</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="s1">&#39;geometry&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">gdf_data</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+
+    <span class="n">gdf_data</span><span class="o">.</span><span class="n">set_crs</span><span class="p">(</span><span class="s1">&#39;epsg:4326&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">cat</span> <span class="ow">and</span> <span class="n">cat_col</span><span class="p">:</span>
+        <span class="n">gdf_data</span> <span class="o">=</span> <span class="n">gdf_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">gdf_data</span><span class="p">[</span><span class="n">cat_col</span><span class="p">]</span> <span class="o">==</span> <span class="n">cat</span><span class="p">]</span>
+
+    <span class="n">q_1</span> <span class="o">=</span> <span class="n">quantiles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">q_2</span> <span class="o">=</span> <span class="n">quantiles</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">q_low</span> <span class="o">=</span> <span class="n">gdf_data</span><span class="p">[</span><span class="n">num_col</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">q_1</span><span class="p">)</span> <span class="k">if</span> <span class="n">quantiles</span> <span class="k">else</span> <span class="n">gdf_data</span><span class="p">[</span><span class="n">num_col</span><span class="p">]</span>
+    <span class="n">q_high</span> <span class="o">=</span> <span class="n">gdf_data</span><span class="p">[</span><span class="n">num_col</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span>
+        <span class="n">q_2</span><span class="p">)</span> <span class="k">if</span> <span class="n">quantiles</span> <span class="k">else</span> <span class="n">gdf_data</span><span class="p">[</span><span class="n">num_col</span><span class="p">]</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+
+    <span class="n">gdf_data</span> <span class="o">=</span> <span class="n">gdf_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">gdf_data</span><span class="p">[</span><span class="n">num_col</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">q_low</span><span class="p">]</span>
+    <span class="n">gdf_data</span> <span class="o">=</span> <span class="n">gdf_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">gdf_data</span><span class="p">[</span><span class="n">num_col</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">q_high</span><span class="p">]</span>
+
+    <span class="n">gdf_data</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="n">num_col</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Reds&#39;</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">grid</span><span class="o">.</span><span class="n">exterior</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span>
+        <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.08</span>
+    <span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="load_breda_gdf">
+<a class="viewcode-back" href="../../src.utils.html#src.utils.load_breda_gdf">[docs]</a>
+<span class="k">def</span> <span class="nf">load_breda_gdf</span><span class="p">():</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">constants</span><span class="o">.</span><span class="n">PATH</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">RAW_DIRECTORY</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">NEIGHBOURHOOD_DATASET_NAME</span><span class="p">)))</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">gdf</span><span class="o">.</span><span class="n">gemeentenaam</span> <span class="o">==</span> <span class="s1">&#39;Breda&#39;</span><span class="p">]</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">clean_GeoDataFrame</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="s1">&#39;buurtnaam&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gdf</span></div>
+
+
+
+<span class="nd">@injectable</span>
+<span class="k">def</span> <span class="nf">make_st_map</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">gdf</span><span class="p">,</span> <span class="n">col_color</span><span class="p">,</span> <span class="n">locations</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="n">hover_data</span><span class="o">=</span><span class="p">[</span>
+    <span class="s1">&#39;Neighbourhoods&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;green_score&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;GeregistreerdeOverlast_1&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;moving_frequency&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;GeregistreerdeMisdrijven_1&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Livability index&#39;</span><span class="p">,</span>
+<span class="p">]):</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">choropleth</span><span class="p">(</span>
+        <span class="n">data_frame</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+        <span class="n">geojson</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">gdf</span><span class="o">.</span><span class="n">to_json</span><span class="p">()),</span> <span class="n">color</span><span class="o">=</span><span class="n">col_color</span><span class="p">,</span>
+        <span class="n">locations</span><span class="o">=</span><span class="n">locations</span><span class="p">,</span>
+        <span class="n">featureidkey</span><span class="o">=</span><span class="s2">&quot;properties.buurtnaam&quot;</span><span class="p">,</span>
+        <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;mercator&#39;</span><span class="p">,</span>
+        <span class="n">color_continuous_scale</span><span class="o">=</span><span class="s2">&quot;Viridis&quot;</span><span class="p">,</span>
+        <span class="n">animation_frame</span><span class="o">=</span><span class="s1">&#39;year&#39;</span><span class="p">,</span>
+        <span class="n">animation_group</span><span class="o">=</span><span class="s1">&#39;moving_type&#39;</span><span class="p">,</span>
+        <span class="n">labels</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;Neighbourhoods&#39;</span><span class="p">:</span> <span class="s2">&quot;neighbourhood&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;green_score&#39;</span><span class="p">:</span> <span class="s1">&#39;green score&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;GeregistreerdeOverlast_1&#39;</span><span class="p">:</span> <span class="s2">&quot;nuisance&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;moving_frequency&#39;</span><span class="p">:</span> <span class="s1">&#39;moving frequency&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;GeregistreerdeMisdrijven_1&#39;</span><span class="p">:</span> <span class="s1">&#39;crime score&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Livability index&#39;</span><span class="p">:</span> <span class="s1">&#39;liveability score&#39;</span>
+        <span class="p">},</span>
+        <span class="n">hover_data</span><span class="o">=</span><span class="n">hover_data</span>
+    <span class="p">)</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_geos</span><span class="p">(</span><span class="n">fitbounds</span><span class="o">=</span><span class="s2">&quot;geojson&quot;</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+        <span class="n">margin</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;l&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="n">geo</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">bgcolor</span><span class="o">=</span><span class="s1">&#39;rgba(0,0,0,0)&#39;</span><span class="p">),</span>
+        <span class="n">coloraxis_colorbar</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;h&#39;</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=-</span><span class="mf">0.1</span><span class="p">,</span>
+            <span class="n">thickness</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+            <span class="nb">len</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="s2">&quot;bottom&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">score</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fig</span>
+
+
+<div class="viewcode-block" id="clean_GeoDataFrame">
+<a class="viewcode-back" href="../../src.utils.html#src.utils.clean_GeoDataFrame">[docs]</a>
+<span class="k">def</span> <span class="nf">clean_GeoDataFrame</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span> <span class="n">geo_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">district_col</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">district_col</span> <span class="o">=</span> <span class="n">district_col</span> <span class="ow">or</span> <span class="s1">&#39;buurtnaam&#39;</span>
+    <span class="n">geo_col</span> <span class="o">=</span> <span class="n">geo_col</span> <span class="ow">or</span> <span class="s1">&#39;geometry&#39;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="n">epsg</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">set_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="n">epsg</span><span class="p">)</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="n">epsg</span><span class="p">)</span>
+
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">filter</span><span class="p">([</span><span class="n">geo_col</span><span class="p">,</span> <span class="n">district_col</span><span class="p">])</span>
+
+    <span class="n">gdf</span><span class="p">[</span><span class="n">district_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[</span><span class="n">district_col</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">strip</span><span class="p">)</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">district_col</span><span class="p">)</span>
+
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">gdf</span><span class="p">[</span><span class="n">district_col</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">gdf</span></div>
+
+
+
+<div class="viewcode-block" id="export_topoJSON">
+<a class="viewcode-back" href="../../src.utils.html#src.utils.export_topoJSON">[docs]</a>
+<span class="k">def</span> <span class="nf">export_topoJSON</span><span class="p">(</span><span class="n">to_path</span><span class="p">,</span> <span class="n">gdf</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span> <span class="n">geo_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">district_col</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">district_col</span> <span class="o">=</span> <span class="n">district_col</span> <span class="ow">or</span> <span class="s1">&#39;buurtnaam&#39;</span>
+    <span class="n">geo_col</span> <span class="o">=</span> <span class="n">geo_col</span> <span class="ow">or</span> <span class="s1">&#39;geometry&#39;</span>
+
+    <span class="n">clean_gdf</span> <span class="o">=</span> <span class="n">clean_GeoDataFrame</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">epsg</span><span class="p">,</span> <span class="n">geo_col</span><span class="p">,</span> <span class="n">district_col</span><span class="p">)</span>
+
+    <span class="n">clean_gdf</span><span class="p">[</span><span class="s1">&#39;area&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clean_gdf</span><span class="p">[</span><span class="n">geo_col</span><span class="p">]</span><span class="o">.</span><span class="n">area</span>
+    <span class="n">clean_gdf</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clean_gdf</span><span class="p">[</span><span class="n">geo_col</span><span class="p">]</span><span class="o">.</span><span class="n">length</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">clean_gdf</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">topojson</span><span class="o">.</span><span class="n">Topology</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="o">.</span><span class="n">output</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">to_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">fd</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, BUas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

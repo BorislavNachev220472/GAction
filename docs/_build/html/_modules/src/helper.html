@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.helper &mdash; NPEC 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=f2a433a1"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            NPEC
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">NPEC</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.helper</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.helper</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span>
+<span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">ET</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Point</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">shapely.wkt</span>
+<span class="kn">import</span> <span class="nn">osmnx</span> <span class="k">as</span> <span class="nn">ox</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="c1"># Local Utils</span>
+<span class="kn">from</span> <span class="nn">src.utils</span> <span class="kn">import</span> <span class="n">table_reader</span>
+<span class="kn">import</span> <span class="nn">src.constants</span> <span class="k">as</span> <span class="nn">constants</span>
+
+
+<div class="viewcode-block" id="generate_path">
+<a class="viewcode-back" href="../../src.html#src.helper.generate_path">[docs]</a>
+<span class="k">def</span> <span class="nf">generate_path</span><span class="p">(</span><span class="n">path_to_directory</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates the absolute PATH to a file based on the given parameters</span>
+<span class="sd">    :param path_to_directory: (str) relative PATH to the folder containing the :param file_name</span>
+<span class="sd">    :param file_name: (str) the name of the file which is in the param path_to_directory</span>
+<span class="sd">    :return:</span>
+<span class="sd">        (str) The combination of the path_to_directory and file_name.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">path_to_directory</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">path_to_directory</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">or</span> <span class="n">file_name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid parameters detected. Cannot generate PATH with these input parameters.&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path_to_directory</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s1">&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="prepare_data_directory">
+<a class="viewcode-back" href="../../src.html#src.helper.prepare_data_directory">[docs]</a>
+<span class="k">def</span> <span class="nf">prepare_data_directory</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepares the data directory by creating the required folders if they do not exist.</span>
+<span class="sd">    :return:</span>
+<span class="sd">        NoneType</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Preparing data directory...&quot;</span><span class="p">)</span>
+    <span class="n">exist</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">PATH</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">exist</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">PATH</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">folder</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">DATA_FOLDERS</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">generate_path</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">PATH</span><span class="p">,</span> <span class="n">folder</span><span class="p">)):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">generate_path</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">PATH</span><span class="p">,</span> <span class="n">folder</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="save_df">
+<a class="viewcode-back" href="../../src.html#src.helper.save_df">[docs]</a>
+<span class="k">def</span> <span class="nf">save_df</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">df_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">is_preprocessed</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Saves the passed dataframe to its corresponding directory depending on its state. The state is defined by the</span>
+<span class="sd">    :param is_preprocessed.</span>
+<span class="sd">    :param df: (pd.DataFrame) object.</span>
+<span class="sd">    :param df_name: (str) the name of the dataframe</span>
+<span class="sd">    :param is_preprocessed: (bool) the state of the dataframe</span>
+<span class="sd">    :return:</span>
+<span class="sd">        NoneType</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">df_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid parameters detected. Cannot save DataFrame with these input parameters.&#39;</span><span class="p">)</span>
+    <span class="n">is_final</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_final&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">is_final</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">df_path</span> <span class="o">=</span> <span class="n">generate_path</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">PATH</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">FINAL_DIRECTORY</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">generate_path</span><span class="p">(</span><span class="n">df_path</span><span class="p">,</span> <span class="n">df_name</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="n">constants</span><span class="o">.</span><span class="n">SEPARATOR</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">constants</span><span class="o">.</span><span class="n">INCLUDE_INDEX</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">is_preprocessed</span><span class="p">:</span>
+        <span class="n">df_path</span> <span class="o">=</span> <span class="n">generate_path</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">PATH</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">PREPROCESSED_DIRECTORY</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">generate_path</span><span class="p">(</span><span class="n">df_path</span><span class="p">,</span> <span class="n">df_name</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="n">constants</span><span class="o">.</span><span class="n">SEPARATOR</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">constants</span><span class="o">.</span><span class="n">INCLUDE_INDEX</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saving </span><span class="si">{</span><span class="n">constants</span><span class="o">.</span><span class="n">PREPROCESSED_DIRECTORY</span><span class="si">}</span><span class="s2"> data...&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">df_path</span> <span class="o">=</span> <span class="n">generate_path</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">PATH</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">RAW_DIRECTORY</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">generate_path</span><span class="p">(</span><span class="n">df_path</span><span class="p">,</span> <span class="n">df_name</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="n">constants</span><span class="o">.</span><span class="n">SEPARATOR</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">constants</span><span class="o">.</span><span class="n">INCLUDE_INDEX</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df_path</span></div>
+
+
+
+<div class="viewcode-block" id="get_full_value">
+<a class="viewcode-back" href="../../src.html#src.helper.get_full_value">[docs]</a>
+<span class="k">def</span> <span class="nf">get_full_value</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transforming the given value to it&#39;s full definition using the metadata.</span>
+<span class="sd">    :param arr: (list) containing the &#39;Key&#39;(short definition) and &#39;Title&#39;(full definition)</span>
+<span class="sd">    which wil be used to transform the param value.</span>
+<span class="sd">    :param value: (str) parameter which will be transformed to it&#39;s full definition.</span>
+<span class="sd">    :return:</span>
+<span class="sd">        The full definition of the param value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">arr</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid parameters detected. Cannot Get Full Value with these input parameters.&#39;</span><span class="p">)</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">elm</span> <span class="ow">in</span> <span class="n">arr</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">elm</span><span class="p">[</span><span class="s1">&#39;Key&#39;</span><span class="p">]:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">elm</span><span class="p">[</span><span class="s1">&#39;Title&#39;</span><span class="p">]</span>
+            <span class="k">break</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+
+<div class="viewcode-block" id="download_metadata">
+<a class="viewcode-back" href="../../src.html#src.helper.download_metadata">[docs]</a>
+<span class="k">def</span> <span class="nf">download_metadata</span><span class="p">(</span><span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">columns_to_transform</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Downloads metadata based on the input parameters and saves the fetched information to (dict).</span>
+<span class="sd">    :param code: (str) containing the corresponding code of city from the Netherlands</span>
+<span class="sd">    :param columns_to_transform: (list) containing the column names which need to be transformed.</span>
+<span class="sd">    :return:</span>
+<span class="sd">    (dict) containing key:value pairs with the metadata in the format specified below.</span>
+<span class="sd">    Example:</span>
+<span class="sd">     {&#39;Demo&#39;: [{&#39;metadata&#39;: &#39;...&#39;}, {&#39;value&#39;: [{&#39;Key&#39;: &#39;demo&#39;, &#39;Title&#39;: &#39;memo&#39;}]}],</span>
+<span class="sd">            &#39;Demo2&#39;: [{&#39;metadata&#39;: &#39;...&#39;}, {&#39;value&#39;: [{&#39;Key&#39;: &#39;demo2&#39;, &#39;Title&#39;: &#39;memo2&#39;}]}],</span>
+<span class="sd">                    &#39;Demo3&#39;: [{&#39;metadata&#39;: &#39;...&#39;}, {&#39;value&#39;: [{&#39;Key&#39;: &#39;demo3&#39;, &#39;Title&#39;: &#39;memo3&#39;}]}]}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">code</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">columns_to_transform</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns_to_transform</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">code</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid parameters detected. Cannot Download MetaData with these input parameters.&#39;</span><span class="p">)</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">columns_to_transform</span><span class="p">:</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;https://dataderden.cbs.nl/ODataApi/odata/</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">:</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">metadata</span></div>
+
+
+
+<div class="viewcode-block" id="download_data_from_police">
+<a class="viewcode-back" href="../../src.html#src.helper.download_data_from_police">[docs]</a>
+<span class="k">def</span> <span class="nf">download_data_from_police</span><span class="p">(</span><span class="n">link_to_fetch</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">columns_to_transform</span><span class="p">,</span> <span class="n">desc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Downloads data from the https://dataderden.cbs.nl website based on the given parameters using pagination</span>
+<span class="sd">    :param link_to_fetch: (str) link to the first pagination link to the dataset which will be downloaded.</span>
+<span class="sd">    :param code: (str) city code for which the data will be downloaded</span>
+<span class="sd">    :param columns_to_transform: (list) containing the columns which have to be transformed by using the metadata.</span>
+<span class="sd">    :param desc: (str) parameter used to log the state of the function.</span>
+<span class="sd">    :return:</span>
+<span class="sd">    Returns (pd.DataFrame) with the data downloaded from https://dataderden.cbs.nl.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">code</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">columns_to_transform</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">link_to_fetch</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns_to_transform</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> \
+            <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">code</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">link_to_fetch</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid parameters detected. Cannot Download Data From Police with these input parameters.&#39;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">download_metadata</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">columns_to_transform</span><span class="p">)</span>
+
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">link_to_fetch</span><span class="p">)</span>
+        <span class="n">is_next</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">a</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">iter</span><span class="p">():</span>
+            <span class="k">if</span> <span class="s1">&#39;content&#39;</span> <span class="ow">in</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="p">:</span>
+                <span class="n">all_descendants</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">iter</span><span class="p">())</span>
+                <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">all_descendants</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">el</span><span class="o">.</span><span class="n">text</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+                    <span class="k">if</span> <span class="n">el</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+                        <span class="n">key</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">text</span>
+                        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">columns_to_transform</span><span class="p">:</span>
+                            <span class="n">value</span> <span class="o">=</span> <span class="n">get_full_value</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">value</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                            <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;link&#39;</span> <span class="ow">in</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span> <span class="ow">and</span> <span class="s1">&#39;next&#39;</span> <span class="ow">in</span> <span class="n">elem</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;rel&#39;</span><span class="p">]:</span>
+                <span class="n">is_next</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">link_to_fetch</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;href&#39;</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">link_to_fetch</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_next</span><span class="p">:</span>
+            <span class="k">break</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="download_file">
+<a class="viewcode-back" href="../../src.html#src.helper.download_file">[docs]</a>
+<span class="k">def</span> <span class="nf">download_file</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">desc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Downloads and saves files to the file system based on the given parameters.</span>
+<span class="sd">    :param url: (str) containing the url to the file</span>
+<span class="sd">    :param file_name: (str) the file_name which the downloaded file will have.</span>
+<span class="sd">    :param desc: (str) parameter used to log the state of the function.</span>
+<span class="sd">    :return:</span>
+<span class="sd">     NoneType</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid parameters detected. Cannot Download File with these input parameters.&#39;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="n">raw_path</span> <span class="o">=</span> <span class="n">generate_path</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">PATH</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">RAW_DIRECTORY</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">generate_path</span><span class="p">(</span><span class="n">raw_path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">),</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ConnectionAbortedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error accessing the </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> file. The file might was renamed/removed/moved.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_articles">
+<a class="viewcode-back" href="../../src.html#src.helper.get_articles">[docs]</a>
+<span class="k">def</span> <span class="nf">get_articles</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Method which uses the library &#39;BeautifulSoup&#39; to read and extract information from the raw .html file.</span>
+<span class="sd">    :param url:  (str) containing the url to the website.</span>
+<span class="sd">    :return:</span>
+<span class="sd">    Returns the extracted information as a ResultSet of PageElements.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid parameters detected. Cannot Download MetaData with these input parameters.&#39;</span><span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">),</span> <span class="s1">&#39;html.parser&#39;</span><span class="p">)</span>
+        <span class="n">articles</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;article&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">articles</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ConnectionAbortedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error accessing the </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_neighbourhood_on_coordinates">
+<a class="viewcode-back" href="../../src.html#src.helper.get_neighbourhood_on_coordinates">[docs]</a>
+<span class="k">def</span> <span class="nf">get_neighbourhood_on_coordinates</span><span class="p">(</span><span class="n">neighbourhood</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">points_column_names</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if the given param points are within the param neighbourhood shape and sets the corresponding Neighbourhood</span>
+<span class="sd">    to the positive results.</span>
+<span class="sd">    :param neighbourhood: (list) containing (shapley.POLYGON) the shape data and (name) for each neighbourhood.</span>
+<span class="sd">    :param points: (list) containing the points which will be connected to Neighbourhood.</span>
+<span class="sd">    :param df: (pd.DataFrame) the whole dataframe in which the corresponding Neighbourhood will be set to the</span>
+<span class="sd">    &#39;Neighbourhood&#39; column</span>
+<span class="sd">    :param points_column_names: (list) containing the column names corresponding to of the latitude and longitude.</span>
+<span class="sd">    :return:</span>
+<span class="sd">    NoneType. The data is being changed using the reference of the param df</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">neighbourhood</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">neighbourhood</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">points</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span>
+            <span class="n">points</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">points_column_names</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">points_column_names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid parameters detected. Cannot Map Coordinates with these input parameters.&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">coordinates</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">points</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">within</span><span class="p">(</span><span class="n">neighbourhood</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">points_column_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">==</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">points_column_names</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">==</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">y</span><span class="p">),</span>
+                <span class="s1">&#39;Neighbourhood&#39;</span>
+            <span class="p">]</span> <span class="o">=</span> <span class="n">neighbourhood</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="get_neighbourhood_on_geometry">
+<a class="viewcode-back" href="../../src.html#src.helper.get_neighbourhood_on_geometry">[docs]</a>
+<span class="k">def</span> <span class="nf">get_neighbourhood_on_geometry</span><span class="p">(</span><span class="n">neighbourhood</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Checks if the given param neighbourhood is within the &#39;geometry&#39; values in the param df. If so, the method sets</span>
+<span class="sd">     the corresponding Neighbourhood to the positive results</span>
+<span class="sd">    :param neighbourhood: (list) containing (shapley.POLYGON) the shape data and (name) for each neighbourhood.</span>
+<span class="sd">    :param df: (pd.DataFrame) the whole dataframe in which the corresponding Neighbourhood will be set to the</span>
+<span class="sd">    &#39;Neighbourhood&#39; column</span>
+<span class="sd">    :return:</span>
+<span class="sd">    NoneType. The data is being changed using the reference of the param df</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">neighbourhood</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">neighbourhood</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid parameters detected. Cannot Map Geometry with these input parameters.&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">house</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">house</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">house</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">wkt</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">house</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">house</span><span class="o">.</span><span class="n">within</span><span class="p">(</span><span class="n">neighbourhood</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;geometry_temp&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">house</span><span class="p">),</span> <span class="s1">&#39;Neighbourhood&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">neighbourhood</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="map_geometries_to_neighbourhoods">
+<a class="viewcode-back" href="../../src.html#src.helper.map_geometries_to_neighbourhoods">[docs]</a>
+<span class="k">def</span> <span class="nf">map_geometries_to_neighbourhoods</span><span class="p">(</span><span class="n">coordinate_dfs</span><span class="p">,</span> <span class="n">coordinate_columns_dfs</span><span class="p">,</span> <span class="n">geometry_dfs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function maps many dataframes containing coordinates or geometries to their corresponding Neighbourhoods</span>
+<span class="sd">    :param coordinate_dfs: (list) containing the dataframes with coordinates. The name of the coordinate columns is</span>
+<span class="sd">    strictly defined</span>
+<span class="sd">    :param coordinate_columns_dfs: (list) containing inner (list) of the column names for the coordinate dataframe</span>
+<span class="sd">    :param geometry_dfs: (list) containing the dataframes with coordinates. The name of the geometry column is</span>
+<span class="sd">    strictly defined: &#39;geometry&#39;</span>
+<span class="sd">    :return:</span>
+<span class="sd">        NoneType. The dataframes are being changed by reference.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">coordinate_dfs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">coordinate_dfs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">coordinate_columns_dfs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span>
+            <span class="n">coordinate_columns_dfs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">geometry_dfs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">geometry_dfs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid parameters detected. Cannot Map Geometries with these input parameters.&#39;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Mapping neighbourhoods based on coordinate and geometry data...&#39;</span><span class="p">)</span>
+    <span class="n">neighbourhoods</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">generate_path</span><span class="p">(</span><span class="n">generate_path</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">PATH</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">RAW_DIRECTORY</span><span class="p">),</span>
+                                                 <span class="n">constants</span><span class="o">.</span><span class="n">NEIGHBOURHOOD_DATASET_NAME</span><span class="p">))</span>
+    <span class="n">neighbourhoods</span> <span class="o">=</span> <span class="n">neighbourhoods</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">)</span>
+
+    <span class="n">points</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">coordinate_dfs</span><span class="p">)):</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="p">[</span><span class="n">Point</span><span class="p">(</span><span class="n">el</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">el</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">coordinate_dfs</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="n">coordinate_columns_dfs</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+        <span class="n">points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+        <span class="n">coordinate_dfs</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;Neighbourhood&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Preparing Coordinate dataset </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s1">...&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">geometry_dfs</span><span class="p">)):</span>
+        <span class="n">geometry_dfs</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;geometry_temp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">geometry_dfs</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="n">geometry_dfs</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;Neighbourhood&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Optimising Geometry dataset </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s1">...&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">neighbourhood</span> <span class="ow">in</span> <span class="n">neighbourhoods</span><span class="p">[</span><span class="n">neighbourhoods</span><span class="p">[</span><span class="s1">&#39;gemeentenaam&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Breda&#39;</span><span class="p">][[</span><span class="s1">&#39;geometry&#39;</span><span class="p">,</span> <span class="s1">&#39;buurtnaam&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">coordinate_dfs</span><span class="p">)):</span>
+            <span class="n">get_neighbourhood_on_coordinates</span><span class="p">(</span><span class="n">neighbourhood</span><span class="p">,</span> <span class="n">points</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">coordinate_dfs</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                                             <span class="n">coordinate_columns_dfs</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">geometry_dfs</span><span class="p">)):</span>
+            <span class="n">get_neighbourhood_on_geometry</span><span class="p">(</span><span class="n">neighbourhood</span><span class="p">,</span> <span class="n">geometry_dfs</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Pre-processing has been done for </span><span class="si">{</span><span class="n">neighbourhood</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1"> district.&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">geometry_dfs</span><span class="p">)):</span>
+        <span class="n">geometry_dfs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;geometry_temp&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Cleaning Geometry dataset </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s1">...&#39;</span><span class="p">)</span>
+
+    <span class="n">neighbourhoods</span> <span class="o">=</span> <span class="n">neighbourhoods</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">neighbourhoods</span><span class="p">[</span><span class="s1">&#39;gemeentenaam&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Breda&#39;</span><span class="p">]</span>
+    <span class="n">neighbourhoods</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">generate_path</span><span class="p">(</span><span class="n">generate_path</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">PATH</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">PREPROCESSED_DIRECTORY</span><span class="p">),</span>
+                                         <span class="n">constants</span><span class="o">.</span><span class="n">NEIGHBOURHOOD_DATASET_NAME</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="s1">&#39;GPKG&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="download_lights_data">
+<a class="viewcode-back" href="../../src.html#src.helper.download_lights_data">[docs]</a>
+<span class="k">def</span> <span class="nf">download_lights_data</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function is used to encapsulate the downloading steps of the lights dataset.</span>
+<span class="sd">    :return:</span>
+<span class="sd">    NoneType</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Downloading Lights data...&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">LIGHTS_DATASET_LINK</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="download_police_data">
+<a class="viewcode-back" href="../../src.html#src.helper.download_police_data">[docs]</a>
+<span class="k">def</span> <span class="nf">download_police_data</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function is used to encapsulate the downloading steps of the police dataset.</span>
+<span class="sd">    :return:</span>
+<span class="sd">    NoneType</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Downloading Police data...&quot;</span><span class="p">)</span>
+    <span class="n">patrols_data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;names&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;contacts&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;locations&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">articles</span> <span class="o">=</span> <span class="n">get_articles</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">POLICE_DATASET_LINK</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">))</span>
+
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">articles</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">articles</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;h3&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">contact_info</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;dd&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">location_info</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;dd&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">patrols_data</span><span class="p">[</span><span class="s1">&#39;names&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">patrols_data</span><span class="p">[</span><span class="s1">&#39;contacts&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">contact_info</span><span class="p">)</span>
+            <span class="n">patrols_data</span><span class="p">[</span><span class="s1">&#39;locations&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">location_info</span><span class="p">)</span>
+
+        <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">articles</span> <span class="o">=</span> <span class="n">get_articles</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">POLICE_DATASET_LINK</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;page=</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s1">&amp;&#39;</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">patrols_data</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="download_livability_data">
+<a class="viewcode-back" href="../../src.html#src.helper.download_livability_data">[docs]</a>
+<span class="k">def</span> <span class="nf">download_livability_data</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function is used to encapsulate the downloading steps of the livability dataset.</span>
+<span class="sd">    :return:</span>
+<span class="sd">    NoneType</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Downloading Livability index...&quot;</span><span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">LIVABILITY_DATASET_LINK</span><span class="p">)</span>
+    <span class="n">txt</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span>
+
+    <span class="n">columns</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;&lt;span\s*id=&quot;[\w+-]+&quot;&gt;(?P&lt;column_data&gt;\d+)&lt;/span&gt;&#39;</span><span class="p">,</span> <span class="n">txt</span><span class="p">)</span>
+
+    <span class="n">rows_index</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;&lt;td class=&quot;tab-Buurt-name&quot;&gt;(?P&lt;district_data&gt;[\w -]+)&lt;/td&gt;&#39;</span><span class="p">,</span> <span class="n">txt</span><span class="p">)</span>
+    <span class="n">rows_values</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span>
+        <span class="s1">&#39;&lt;td&gt;[\s</span><span class="se">\t\n</span><span class="s1">]*&lt;span class=&quot;[\w\s-]+&quot;&gt;\d*&lt;/span&gt;[\s</span><span class="se">\t\n</span><span class="s1">]*(?P&lt;field_data&gt;[\w -]+)[\s</span><span class="se">\t\n</span><span class="s1">]*&lt;/td&gt;&#39;</span><span class="p">,</span>
+        <span class="n">txt</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rows_values</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">rows_index</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">))),</span>
+                        <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
+                        <span class="n">index</span><span class="o">=</span><span class="n">rows_index</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">names</span><span class="o">=</span><span class="s1">&#39;Neighbourhoods&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="download_green_index_data">
+<a class="viewcode-back" href="../../src.html#src.helper.download_green_index_data">[docs]</a>
+<span class="k">def</span> <span class="nf">download_green_index_data</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function is used to encapsulate the downloading steps of the green index dataset.</span>
+<span class="sd">    :return:</span>
+<span class="sd">    NoneType</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Connecting to remote server...&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">CONNECTION_STRING</span><span class="p">)</span>
+    <span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">CONNECTION_STRING</span><span class="p">)</span>
+
+    <span class="n">read_table</span> <span class="o">=</span> <span class="n">table_reader</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+    <span class="n">green_index_table</span><span class="p">,</span> <span class="n">green_index_data</span> <span class="o">=</span> <span class="n">read_table</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">GREEN_INDEX_TABLE_NAME</span><span class="p">,</span>
+                                                     <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Downloading Green Index...&quot;</span><span class="p">)</span>
+
+    <span class="n">green_index_data</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">green_index_data</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">green_index_data</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">green_index_data</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">green_index_data</span></div>
+
+
+
+<div class="viewcode-block" id="download_poi_data_from_config">
+<a class="viewcode-back" href="../../src.html#src.helper.download_poi_data_from_config">[docs]</a>
+<span class="k">def</span> <span class="nf">download_poi_data_from_config</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function is used to encapsulate the downloading steps of the POI dataset.</span>
+<span class="sd">    :return:</span>
+<span class="sd">    NoneType</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">config_file_path</span> <span class="o">=</span> <span class="n">generate_path</span><span class="p">(</span>
+        <span class="n">generate_path</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">PATH</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">RAW_DIRECTORY</span><span class="p">),</span>
+        <span class="n">constants</span><span class="o">.</span><span class="n">POI_CONFIG_FILE_NAME</span><span class="p">)</span>
+    <span class="n">poi_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">config_file_path</span><span class="p">,</span>
+                         <span class="n">skiprows</span><span class="o">=</span><span class="n">constants</span><span class="o">.</span><span class="n">POI_CONFIG_HEADER_LENGTH</span><span class="p">)[</span><span class="n">constants</span><span class="o">.</span><span class="n">POI_CONFIG_COLUMN_NAME</span><span class="p">]</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;amenity&#39;</span><span class="p">:</span> <span class="n">poi_df</span><span class="o">.</span><span class="n">tolist</span><span class="p">()}</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">config_file_path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ox</span><span class="o">.</span><span class="n">geometries_from_place</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">POI_LOCATION</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="n">tags</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, BUas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
