@@ -71,6 +71,7 @@ jobs:
           git add .
           git commit -m "documentation auto commit"
           git checkout documentation
+          git reset --hard
           git rebase main -X ours
 
       - name: Push changes to source branch
