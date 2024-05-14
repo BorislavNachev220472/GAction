@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "testasddsa"
+name = "pyphenotyper"
 version = "0.1.0"
-description = "DEMO pipeline"
+description = "NPEC pipeline"
 authors = ["Borislav Nachev <220472@buas.nl>",
     "Vlad Bogdan Narcis Matache <224108@buas.nl",
     "Wesley van Gaalen <224682@buas.nl>",
@@ -26,7 +26,6 @@ pytest = "^8.2.0"
 pytest-mock = "^3.14.0"
 sphinx = "^7.3.7"
 coverage = "^7.5.1"
-sphinx_rtd_theme = "2.0.0"
 
 [build-system]
 requires = ["poetry-core"]
