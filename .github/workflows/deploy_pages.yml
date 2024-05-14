@@ -2,7 +2,7 @@ name: Deploy Pages
 
 on:
   push:
-    branches: "documentation"
+    branches: "docs"
 
   workflow_dispatch:
 
@@ -22,10 +22,10 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Check out repository
         uses: actions/checkout@v4
-        with:
-          path: documentation
+      - name: Checkout
+        run: git checkout docs --
       - name: check
         run: ls
       - name: Setup Pages

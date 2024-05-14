@@ -2,7 +2,7 @@ name: Test Environment Check
 
 on:
   push:
-    branches: [ "main", "documentation" ]
+    branches: [ "main", "docs" ]
 
   workflow_dispatch:
 
@@ -44,21 +44,21 @@ jobs:
       - name: Install project
         run: poetry install --no-interaction
 
-#      - name: Push to PyPl
-#        run: |
-#          poetry config pypi-token.pypi ${{ secrets.PYPL }}
-#          poetry build
-#          poetry publish
+      #      - name: Push to PyPl
+      #        run: |
+      #          poetry config pypi-token.pypi ${{ secrets.PYPL }}
+      #          poetry build
+      #          poetry publish
 
-#      - name: Build the Docker image
-#        run: |
-#          poetry export --without-hashes --format=requirements.txt > requirements.txt
-#          docker-compose build
-#      - name: Push Docker Image
-#        run: |
-#          docker tag super_plant_phenotyper3000:latest plantphenotyper/plant_phenotyper_test:latest
-#          docker login -u plantphenotyper -p ${{ secrets.DOCKER }}
-#          docker push plantphenotyper/plant_phenotyper_test:latest
+      #      - name: Build the Docker image
+      #        run: |
+      #          poetry export --without-hashes --format=requirements.txt > requirements.txt
+      #          docker-compose build
+      #      - name: Push Docker Image
+      #        run: |
+      #          docker tag super_plant_phenotyper3000:latest plantphenotyper/plant_phenotyper_test:latest
+      #          docker login -u plantphenotyper -p ${{ secrets.DOCKER }}
+      #          docker push plantphenotyper/plant_phenotyper_test:latest
 
       - name: Refresh docs
         if: ${{ hashFiles('docs/') != '' }}
@@ -78,7 +78,7 @@ jobs:
           git fetch
           git add .
           git commit -m "documentation auto commit"
-          git checkout  documentation
+          git checkout documentation --
           git merge main -Xtheirs --allow-unrelated-histories
           poetry run python ./config/keep_documentation.py
           git commit -m "documentation auto commit"
@@ -88,3 +88,29 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: documentation
+
+  DeployPages:
+    needs: PoetrySetup
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Checkout
+        run: |
+          git fetch
+          git checkout documentation --
+      - name: check
+        run: ls
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload entire repository
+          path: './docs/_build/html/'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
