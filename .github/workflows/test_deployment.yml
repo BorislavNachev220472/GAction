@@ -76,6 +76,20 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: documentation
+#      - name: update changes
+#        run: |
+#          git config user.name "Borislav Nachev"
+#          git config user.email "220472@buas.nl"
+#          git fetch
+#          git add .
+#          git checkout documentation
+#          git commit -m "documentation auto commit"
+#
+#      - name: Push changes to source branch
+#        uses: ad-m/github-push-action@master
+#        with:
+#          github_token: ${{ secrets.GITHUB_TOKEN }}
+#          branch: documentation
 
   DeployHtml:
     needs: PoetrySetup
