@@ -1,4 +1,4 @@
-Welcome to Tech Fusion's documentation!
+Welcome to Tech Fusion's documentation2!
 ================================
 
 .. toctree::
