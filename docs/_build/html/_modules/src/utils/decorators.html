@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.utils.decorators &mdash; NPEC 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=f2a433a1"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            NPEC
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">NPEC</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../utils.html">src.utils</a></li>
+      <li class="breadcrumb-item active">src.utils.decorators</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.utils.decorators</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span><span class="p">,</span> <span class="n">wraps</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+
+<div class="viewcode-block" id="injectable">
+<a class="viewcode-back" href="../../../src.utils.decorators.html#src.utils.decorators.injectable">[docs]</a>
+<span class="k">def</span> <span class="nf">injectable</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dependency injection: initialize functions with a certain value that will be re-passed on every call.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">partial</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="debounced">
+<a class="viewcode-back" href="../../../src.utils.decorators.html#src.utils.decorators.debounced">[docs]</a>
+<span class="k">def</span> <span class="nf">debounced</span><span class="p">(</span><span class="n">sec</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator: Implements a debounce behavior for a function.</span>
+
+<span class="sd">    The debounced decorator delays the execution of the wrapped function by the specified number of seconds (`sec`).</span>
+<span class="sd">    If the wrapped function is called multiple times within the debounce period, only the last call will be executed</span>
+<span class="sd">    after the debounce period has elapsed.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        sec (float, optional): The debounce period in seconds (default is 3).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        function: The decorated function.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        ```</span>
+<span class="sd">        @debounced(sec=2)</span>
+<span class="sd">        def my_function():</span>
+<span class="sd">            print(&quot;Executing my_function&quot;)</span>
+
+<span class="sd">        # Only the last call within 2 seconds will be executed</span>
+<span class="sd">        my_function()  # No output</span>
+<span class="sd">        my_function()  # No output</span>
+<span class="sd">        time.sleep(2)</span>
+<span class="sd">        my_function()  # Output: &quot;Executing my_function&quot;</span>
+<span class="sd">        ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">decorate</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+        <span class="n">pocket</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">end_func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">nonlocal</span> <span class="n">pocket</span>
+            <span class="n">pocket_args</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">pocket_args</span><span class="o">.</span><span class="n">apply_defaults</span><span class="p">()</span>
+
+            <span class="n">pocket_key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">pocket_args</span><span class="p">)</span>
+
+            <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">then</span> <span class="o">=</span> <span class="n">pocket</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pocket_key</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">calc_time</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span> <span class="k">return</span> <span class="n">n</span> <span class="o">-</span> <span class="n">t</span>
+
+            <span class="n">cal_time</span> <span class="o">=</span> <span class="n">calc_time</span><span class="p">(</span><span class="n">now</span><span class="p">,</span> <span class="n">then</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">cal_time</span> <span class="o">&gt;=</span> <span class="n">sec</span><span class="p">:</span>
+                <span class="n">res_returned</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">pocket</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">k</span><span class="p">:</span>
+                    <span class="n">reg_time</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">reg_time</span> <span class="ow">in</span> <span class="n">pocket</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">calc_time</span><span class="p">(</span><span class="n">now</span><span class="p">,</span> <span class="n">reg_time</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">sec</span>
+                <span class="p">}</span>
+                <span class="n">pocket</span><span class="p">[</span><span class="n">pocket_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">now</span>
+
+                <span class="k">return</span> <span class="n">res_returned</span>
+        <span class="k">return</span> <span class="n">end_func</span>
+    <span class="k">return</span> <span class="n">decorate</span></div>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;injectable&#39;</span><span class="p">,</span> <span class="s1">&#39;debounced&#39;</span><span class="p">]</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, BUas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
