@@ -1,4 +1,4 @@
-name: Test Environment Check
+name: Deploy Pages
 
 on:
   push:
@@ -16,8 +16,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  needs: PoetrySetup
-  DeployHtml:
+  DeployPages:
     needs: PoetrySetup
     environment:
       name: github-pages
