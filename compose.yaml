@@ -1,7 +1,0 @@
-services:
-  server:
-    build:
-      context: .
-    image: super_plant_phenotyper3000:latest
-    ports:
-      - 8080:8080
