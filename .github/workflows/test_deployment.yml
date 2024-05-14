@@ -43,15 +43,21 @@ jobs:
         run: poetry install --no-interaction --no-root
       - name: Install project
         run: poetry install --no-interaction
-      - name: Build the Docker image
+      - name: Push to PyPl
         run: |
-          poetry export --without-hashes --format=requirements.txt > requirements.txt
-          docker-compose build
-      - name: Push Docker Image
-        run: |
-          docker tag super_plant_phenotyper3000:latest plantphenotyper/plant_phenotyper_test:latest
-          docker login -u plantphenotyper -p ${{ secrets.DOCKER }}
-          docker push plantphenotyper/plant_phenotyper_test:latest
+          poetry config pypi-token.pypi ${{ secrets.PYPL }}
+          poetry build
+          poetry publish
+
+#      - name: Build the Docker image
+#        run: |
+#          poetry export --without-hashes --format=requirements.txt > requirements.txt
+#          docker-compose build
+#      - name: Push Docker Image
+#        run: |
+#          docker tag super_plant_phenotyper3000:latest plantphenotyper/plant_phenotyper_test:latest
+#          docker login -u plantphenotyper -p ${{ secrets.DOCKER }}
+#          docker push plantphenotyper/plant_phenotyper_test:latest
 
 #      - name: Refresh docs
 #        if: ${{ hashFiles('docs/') != '' }}
