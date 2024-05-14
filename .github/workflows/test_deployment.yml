@@ -62,7 +62,7 @@ jobs:
           pip install sphinx-rtd-theme
           cd docs
           poetry run make html
-      - name: update changes
+      - name: Update changes
         run: |
           git config user.name "Borislav Nachev"
           git config user.email "220472@buas.nl"
