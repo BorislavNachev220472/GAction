@@ -69,7 +69,7 @@ jobs:
           git pull
           git fetch
           git checkout documentation
-          git rebase documentation -X ours
+          git rebase master -X ours
           git add .
           git add ./github/*
           git commit -m "documentation auto commit"
