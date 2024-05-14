@@ -17,7 +17,6 @@ concurrency:
 
 jobs:
   DeployPages:
-    needs: PoetrySetup
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
