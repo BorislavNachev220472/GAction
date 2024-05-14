@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.utils package &mdash; NPEC 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=f2a433a1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            NPEC
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">src.utils package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-src.utils.preprocess_helper">src.utils.preprocess_helper module</a><ul>
+<li><a class="reference internal" href="#src.utils.preprocess_helper.compute_moving_average"><code class="docutils literal notranslate"><span class="pre">compute_moving_average()</span></code></a></li>
+<li><a class="reference internal" href="#src.utils.preprocess_helper.create_pivot_from_df"><code class="docutils literal notranslate"><span class="pre">create_pivot_from_df()</span></code></a></li>
+<li><a class="reference internal" href="#src.utils.preprocess_helper.fill_nan_values"><code class="docutils literal notranslate"><span class="pre">fill_nan_values()</span></code></a></li>
+<li><a class="reference internal" href="#src.utils.preprocess_helper.predict_future_yearly_data"><code class="docutils literal notranslate"><span class="pre">predict_future_yearly_data()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-src.utils">Module contents</a><ul>
+<li><a class="reference internal" href="#src.utils.check_connection"><code class="docutils literal notranslate"><span class="pre">check_connection()</span></code></a></li>
+<li><a class="reference internal" href="#src.utils.clean_GeoDataFrame"><code class="docutils literal notranslate"><span class="pre">clean_GeoDataFrame()</span></code></a></li>
+<li><a class="reference internal" href="#src.utils.data_typing"><code class="docutils literal notranslate"><span class="pre">data_typing()</span></code></a></li>
+<li><a class="reference internal" href="#src.utils.export_topoJSON"><code class="docutils literal notranslate"><span class="pre">export_topoJSON()</span></code></a></li>
+<li><a class="reference internal" href="#src.utils.get_metadata"><code class="docutils literal notranslate"><span class="pre">get_metadata()</span></code></a></li>
+<li><a class="reference internal" href="#src.utils.load_breda_gdf"><code class="docutils literal notranslate"><span class="pre">load_breda_gdf()</span></code></a></li>
+<li><a class="reference internal" href="#src.utils.read_tables"><code class="docutils literal notranslate"><span class="pre">read_tables()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">NPEC</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">src.utils package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/src.utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="src-utils-package">
+<h1>src.utils package<a class="headerlink" href="#src-utils-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="src.utils.decorators.html">src.utils.decorators package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.utils.decorators.html#module-src.utils.decorators">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.utils.decorators.html#src.utils.decorators.debounced"><code class="docutils literal notranslate"><span class="pre">debounced()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.utils.decorators.html#src.utils.decorators.injectable"><code class="docutils literal notranslate"><span class="pre">injectable()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-src.utils.preprocess_helper">
+<span id="src-utils-preprocess-helper-module"></span><h2>src.utils.preprocess_helper module<a class="headerlink" href="#module-src.utils.preprocess_helper" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.preprocess_helper.compute_moving_average">
+<span class="sig-prename descclassname"><span class="pre">src.utils.preprocess_helper.</span></span><span class="sig-name descname"><span class="pre">compute_moving_average</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/preprocess_helper.html#compute_moving_average"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.utils.preprocess_helper.compute_moving_average" title="Link to this definition"></a></dt>
+<dd><blockquote>
+<div><p>Computes the average value of missing np.nan value at idx from the array.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arr</strong> – (np.array) object containing (np.nan) missing values.</p></li>
+<li><p><strong>idx</strong> – (int) index of the (np.nan) value.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The mean of the first and last values between the given index.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.preprocess_helper.create_pivot_from_df">
+<span class="sig-prename descclassname"><span class="pre">src.utils.preprocess_helper.</span></span><span class="sig-name descname"><span class="pre">create_pivot_from_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/preprocess_helper.html#create_pivot_from_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.utils.preprocess_helper.create_pivot_from_df" title="Link to this definition"></a></dt>
+<dd><p>Transforms (pandas.DataFrame) object into (pandas.DataFrame) pivot object. The data is aggregated based on the index
+and columns parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – (pandas.DataFrame) which will be used for the creation of the pivot.</p></li>
+<li><p><strong>index</strong> – text value which will be used as index parameter for the pivot.</p></li>
+<li><p><strong>columns</strong> – text value which will be used as columns parameter for the pivot.</p></li>
+<li><p><strong>values</strong> – text value which will be used as values parameter for the pivot.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(pandas.DataFrame) pivot like object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.preprocess_helper.fill_nan_values">
+<span class="sig-prename descclassname"><span class="pre">src.utils.preprocess_helper.</span></span><span class="sig-name descname"><span class="pre">fill_nan_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pivot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/preprocess_helper.html#fill_nan_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.utils.preprocess_helper.fill_nan_values" title="Link to this definition"></a></dt>
+<dd><blockquote>
+<div><p>Fills (np.nan) values from pivot (pd.DataFrame) object.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pivot</strong> – (pd.DataFrame) pivot object containing (np.nan) values.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Returns (pd.DataFrame) pivot object without (np.nan) values.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.preprocess_helper.predict_future_yearly_data">
+<span class="sig-prename descclassname"><span class="pre">src.utils.preprocess_helper.</span></span><span class="sig-name descname"><span class="pre">predict_future_yearly_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pivot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">future_years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils/preprocess_helper.html#predict_future_yearly_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.utils.preprocess_helper.predict_future_yearly_data" title="Link to this definition"></a></dt>
+<dd><p>Predicts future values for the given param future_years by using ARIMA (Autoregressive Integrated Moving Average)
+model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pivot</strong> – (pd.DataFrame) preprocessed pivot object containing the values for each param type</p></li>
+<li><p><strong>future_years</strong> – (list) containing the future years for which a prediction will be made</p></li>
+<li><p><strong>type</strong> – variable used as a column name for extracting unique values and filtering values from the param pivot</p></li>
+<li><p><strong>index</strong> – usually called <cite>year</cite> this parameter will be used as a column name for getting the yearly based data from the param pivot</p></li>
+<li><p><strong>value</strong> – usually the column name from the pivot table used as a <cite>value</cite>, because the param pivot should be in a pivot like (pd.DataFrame) object format</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(pd.DataFrame) object containing the future data generated with the same format as the passed param pivot.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.utils">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.utils" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.check_connection">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">check_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">engine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils.html#check_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.utils.check_connection" title="Link to this definition"></a></dt>
+<dd><p>debounced: Checks the database connection every 30 seconds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>engine</strong> (<em>sqlalchemy.engine.Engine</em>) – The SQLAlchemy database engine.</p></li>
+<li><p><strong>desc</strong> (<em>str</em><em>, </em><em>optional</em>) – An optional description to include in the success message.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.clean_GeoDataFrame">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">clean_GeoDataFrame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gdf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4326</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geo_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">district_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils.html#clean_GeoDataFrame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.utils.clean_GeoDataFrame" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.data_typing">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">data_typing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">floats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categoricals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_years</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_months</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_days</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils.html#data_typing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.utils.data_typing" title="Link to this definition"></a></dt>
+<dd><p>Performs data typing on a DataFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – The pandas DataFrame to perform data typing on.</p></li>
+<li><p><strong>integers</strong> (<em>list</em><em>, </em><em>optional</em>) – A list of column names to be typed as integers.</p></li>
+<li><p><strong>floats</strong> (<em>list</em><em>, </em><em>optional</em>) – A list of column names to be typed as floats.</p></li>
+<li><p><strong>strings</strong> (<em>list</em><em>, </em><em>optional</em>) – A list of column names to be typed as strings.</p></li>
+<li><p><strong>categoricals</strong> (<em>list</em><em>, </em><em>optional</em>) – A list of column names to be typed as categoricals.</p></li>
+<li><p><strong>dates</strong> (<em>dict</em><em>, </em><em>optional</em>) – A dictionary mapping date column names to their format strings (e.g., {‘date_column’: ‘%Y-%m-%d’}).</p></li>
+<li><p><strong>only_years</strong> (<em>list</em><em>, </em><em>optional</em>) – A list of date column names to extract only the year.</p></li>
+<li><p><strong>only_months</strong> (<em>list</em><em>, </em><em>optional</em>) – A list of date column names to extract only the month.</p></li>
+<li><p><strong>only_days</strong> (<em>list</em><em>, </em><em>optional</em>) – A list of date column names to extract only the day.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The modified DataFrame with the specified column types applied.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.export_topoJSON">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">export_topoJSON</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gdf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4326</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geo_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">district_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils.html#export_topoJSON"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.utils.export_topoJSON" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.get_metadata">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">get_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">engine</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils.html#get_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.utils.get_metadata" title="Link to this definition"></a></dt>
+<dd><p>Retrieves metadata from the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>engine</strong> (<em>sqlalchemy.engine.Engine</em>) – The SQLAlchemy database engine.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The metadata object representing the database schema.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sqlalchemy.MetaData</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.load_breda_gdf">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">load_breda_gdf</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils.html#load_breda_gdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.utils.load_breda_gdf" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.read_tables">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">read_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">engine</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils.html#read_tables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.utils.read_tables" title="Link to this definition"></a></dt>
+<dd><p>Reads tables from the database and returns a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>engine</strong> (<em>sqlalchemy.engine.Engine</em>) – The SQLAlchemy database engine.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary mapping table names to pandas DataFrames.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, BUas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
