@@ -67,7 +67,7 @@ jobs:
           git config user.name "Borislav Nachev"
           git config user.email "220472@buas.nl"
           git fetch
-          git stash 
+          git stash pop
           git checkout documentation
           git add .
           git commit -m "documentation auto commit"
