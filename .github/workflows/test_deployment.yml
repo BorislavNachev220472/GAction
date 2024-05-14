@@ -67,10 +67,10 @@ jobs:
           git config user.name "Borislav Nachev"
           git config user.email "220472@buas.nl"
           git fetch
-          git add .
-          git checkout documentation
-          git commit -m "documentation auto commit"
           git stash 
+          git checkout documentation
+          git add .
+          git commit -m "documentation auto commit"
 
       - name: Push changes to source branch
         uses: ad-m/github-push-action@master
