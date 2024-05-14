@@ -66,7 +66,7 @@ jobs:
 #      - name: Generate docs
 #        run: |
 #          poetry run sphinx-quickstart docs --quiet -p NPEC -a BUas -v 1.0 -t config/
-#          poetry run sphinx-apidoc -o docs testASDDSA/
+#          poetry run sphinx-apidoc -o docs testasddsa/
 #          pip install sphinx-rtd-theme
 #          cd docs
 #          poetry run make html

@@ -1,5 +1,5 @@
 import pytest
-from testASDDSA.model import borislav_preprocessing as bp
+from testasddsa.model import borislav_preprocessing as bp
 
 
 class TestGetYearsToPredict(object):
