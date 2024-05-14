@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.main &mdash; NPEC 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=f2a433a1"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            NPEC
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">NPEC</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.main</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.main</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="c1"># Local Utils</span>
+<span class="kn">import</span> <span class="nn">src.helper</span> <span class="k">as</span> <span class="nn">helper</span>
+<span class="kn">import</span> <span class="nn">src.constants</span> <span class="k">as</span> <span class="nn">constants</span>
+<span class="kn">import</span> <span class="nn">src.model.andrea_preprocessing</span> <span class="k">as</span> <span class="nn">ap</span>
+<span class="kn">import</span> <span class="nn">src.model.borislav_preprocessing</span> <span class="k">as</span> <span class="nn">bp</span>
+<span class="kn">import</span> <span class="nn">src.model.RF_model</span> <span class="k">as</span> <span class="nn">rf_model</span>
+<span class="kn">import</span> <span class="nn">src.model.LR_model_with_interactions</span> <span class="k">as</span> <span class="nn">lr_model</span>
+
+
+<div class="viewcode-block" id="download_and_preprocess_data">
+<a class="viewcode-back" href="../../src.html#src.main.download_and_preprocess_data">[docs]</a>
+<span class="k">def</span> <span class="nf">download_and_preprocess_data</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function is created so that it can be linked to Poetry Custom Script Execution. It encapsulates the logic for the initial workspace setup for this project.</span>
+<span class="sd">    :return:</span>
+<span class="sd">    NoneType</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Project initialization...&quot;</span><span class="p">)</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">prepare_data_directory</span><span class="p">()</span>
+
+    <span class="n">lights_data</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">download_lights_data</span><span class="p">()</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">save_df</span><span class="p">(</span><span class="n">lights_data</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">LIGHTS_DATASET_NAME</span><span class="p">,</span> <span class="n">is_preprocessed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">patrols_data</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">download_police_data</span><span class="p">()</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">save_df</span><span class="p">(</span><span class="n">patrols_data</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">PATROL_DATASET_NAME</span><span class="p">,</span> <span class="n">is_preprocessed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">livability_index_data</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">download_livability_data</span><span class="p">()</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">save_df</span><span class="p">(</span><span class="n">livability_index_data</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">LIVABILITY_DATASET_NAME</span><span class="p">,</span> <span class="n">is_preprocessed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">green_index_data</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">download_green_index_data</span><span class="p">()</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">save_df</span><span class="p">(</span><span class="n">green_index_data</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">GREEN_INDEX_DATASET_NAME</span><span class="p">,</span> <span class="n">is_preprocessed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">recorded_crimes_data</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">download_data_from_police</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">CRIME_LINK_TO_FETCH</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">CRIME_CODE</span><span class="p">,</span>
+                                                            <span class="n">constants</span><span class="o">.</span><span class="n">CRIME_COLUMNS_TO_TRANSFORM</span><span class="p">,</span>
+                                                            <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Downloading Crime Data...&quot;</span><span class="p">)</span>
+    <span class="n">public_nuisance_data</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">download_data_from_police</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">POLICE_LINK_TO_FETCH</span><span class="p">,</span>
+                                                            <span class="n">constants</span><span class="o">.</span><span class="n">POLICE_CODE</span><span class="p">,</span>
+                                                            <span class="n">constants</span><span class="o">.</span><span class="n">POLICE_COLUMNS_TO_TRANSFORM</span><span class="p">,</span>
+                                                            <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Downloading Nuisance Data...&quot;</span><span class="p">)</span>
+
+    <span class="n">helper</span><span class="o">.</span><span class="n">save_df</span><span class="p">(</span><span class="n">recorded_crimes_data</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">RECORDED_CRIMES_DATASET_NAME</span><span class="p">,</span> <span class="n">is_preprocessed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">save_df</span><span class="p">(</span><span class="n">public_nuisance_data</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">PUBLIC_NUISANCE_DATASET_NAME</span><span class="p">,</span> <span class="n">is_preprocessed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">helper</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">POI_CONFIG_FILE_LINK</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">POI_CONFIG_FILE_NAME</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Downloading POI Data...&quot;</span><span class="p">)</span>
+    <span class="n">poiS</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">download_poi_data_from_config</span><span class="p">()</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">save_df</span><span class="p">(</span><span class="n">poiS</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">POI_DATASET_NAME</span><span class="p">,</span> <span class="n">is_preprocessed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">helper</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">MOVE_HOUSES_DATASET_LINK</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">MOVE_HOUSES_DATASET_NAME</span><span class="p">,</span>
+                         <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Downloading Move Houses Data...&quot;</span><span class="p">)</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">NEIGHBOURHOOD_DATASET_LINK</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">NEIGHBOURHOOD_DATASET_NAME</span><span class="p">,</span>
+                         <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Downloading Neighbourhood Data...&quot;</span><span class="p">)</span>
+
+    <span class="n">preprocess_downloaded_raw_data</span><span class="p">()</span>
+    <span class="n">train_model_on_new_data</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="preprocess_downloaded_raw_data">
+<a class="viewcode-back" href="../../src.html#src.main.preprocess_downloaded_raw_data">[docs]</a>
+<span class="k">def</span> <span class="nf">preprocess_downloaded_raw_data</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function is created so that it can be linked to Poetry Custom Script Execution. It encapsulates the logic for the preprocessing for this project.</span>
+<span class="sd">    :return:</span>
+<span class="sd">    NoneType</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Reading RAW data...&#39;</span><span class="p">)</span>
+    <span class="n">lights_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">generate_path</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">generate_path</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">PATH</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">RAW_DIRECTORY</span><span class="p">),</span>
+                                                   <span class="n">constants</span><span class="o">.</span><span class="n">LIGHTS_DATASET_NAME</span><span class="p">))</span>
+    <span class="n">green_index_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">generate_path</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">generate_path</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">PATH</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">RAW_DIRECTORY</span><span class="p">),</span>
+                                                        <span class="n">constants</span><span class="o">.</span><span class="n">GREEN_INDEX_DATASET_NAME</span><span class="p">))</span>
+    <span class="n">poiS</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">generate_path</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">generate_path</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">PATH</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">RAW_DIRECTORY</span><span class="p">),</span>
+                                            <span class="n">constants</span><span class="o">.</span><span class="n">POI_DATASET_NAME</span><span class="p">))</span>
+    <span class="n">livability_index_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+        <span class="n">helper</span><span class="o">.</span><span class="n">generate_path</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">generate_path</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">PATH</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">RAW_DIRECTORY</span><span class="p">),</span>
+                             <span class="n">constants</span><span class="o">.</span><span class="n">LIVABILITY_DATASET_NAME</span><span class="p">))</span>
+    <span class="n">recorded_crimes_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+        <span class="n">helper</span><span class="o">.</span><span class="n">generate_path</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">generate_path</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">PATH</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">RAW_DIRECTORY</span><span class="p">),</span>
+                             <span class="n">constants</span><span class="o">.</span><span class="n">RECORDED_CRIMES_DATASET_NAME</span><span class="p">))</span>
+    <span class="n">public_nuisance_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+        <span class="n">helper</span><span class="o">.</span><span class="n">generate_path</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">generate_path</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">PATH</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">RAW_DIRECTORY</span><span class="p">),</span>
+                             <span class="n">constants</span><span class="o">.</span><span class="n">PUBLIC_NUISANCE_DATASET_NAME</span><span class="p">))</span>
+
+    <span class="n">move_houses_data</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">generate_path</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">generate_path</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">PATH</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">RAW_DIRECTORY</span><span class="p">),</span>
+                                                          <span class="n">constants</span><span class="o">.</span><span class="n">MOVE_HOUSES_DATASET_NAME</span><span class="p">))</span>
+    <span class="n">aggregate_raw_data</span><span class="p">(</span><span class="n">lights_data</span><span class="p">,</span> <span class="n">green_index_data</span><span class="p">,</span> <span class="n">move_houses_data</span><span class="p">,</span> <span class="n">poiS</span><span class="p">,</span> <span class="n">livability_index_data</span><span class="p">,</span>
+                       <span class="n">recorded_crimes_data</span><span class="p">,</span> <span class="n">public_nuisance_data</span><span class="p">)</span>
+    <span class="n">train_model_on_new_data</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="aggregate_raw_data">
+<a class="viewcode-back" href="../../src.html#src.main.aggregate_raw_data">[docs]</a>
+<span class="k">def</span> <span class="nf">aggregate_raw_data</span><span class="p">(</span><span class="n">lights_data</span><span class="p">,</span> <span class="n">green_index_data</span><span class="p">,</span> <span class="n">move_houses_data</span><span class="p">,</span> <span class="n">poiS</span><span class="p">,</span> <span class="n">livability_index_data</span><span class="p">,</span>
+                       <span class="n">recorded_crimes_data</span><span class="p">,</span>
+                       <span class="n">public_nuisance_data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function encapsulates the logic for the preprocessing for each dataset passed as input parameters.</span>
+<span class="sd">    :param lights_data: (pd.DataFrame) object.</span>
+<span class="sd">    :param green_index_data: (pd.DataFrame) object.</span>
+<span class="sd">    :param move_houses_data: (pd.DataFrame) object.</span>
+<span class="sd">    :param poiS: (pd.DataFrame) object.</span>
+<span class="sd">    :param livability_index_data: (pd.DataFrame) object.</span>
+<span class="sd">    :param recorded_crimes_data: (pd.DataFrame) object.</span>
+<span class="sd">    :param public_nuisance_data: (pd.DataFrame) object.</span>
+<span class="sd">    :return:</span>
+<span class="sd">    NoneType</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Pre-processing the downloaded data...&#39;</span><span class="p">)</span>
+
+    <span class="n">helper</span><span class="o">.</span><span class="n">map_geometries_to_neighbourhoods</span><span class="p">([</span><span class="n">lights_data</span><span class="p">,</span> <span class="n">green_index_data</span><span class="p">],</span>
+                                            <span class="p">[[</span><span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span> <span class="s1">&#39;latitude&#39;</span><span class="p">]],</span>
+                                            <span class="p">[</span><span class="n">move_houses_data</span><span class="p">,</span> <span class="n">poiS</span><span class="p">])</span>
+
+    <span class="n">livability_index_data</span> <span class="o">=</span> <span class="n">ap</span><span class="o">.</span><span class="n">preprocess_livability</span><span class="p">(</span><span class="n">livability_index_data</span><span class="p">)</span>
+    <span class="n">recorded_crimes_data</span> <span class="o">=</span> <span class="n">ap</span><span class="o">.</span><span class="n">preprocess_crimes</span><span class="p">(</span><span class="n">recorded_crimes_data</span><span class="p">)</span>
+
+    <span class="n">public_nuisance_data</span> <span class="o">=</span> <span class="n">bp</span><span class="o">.</span><span class="n">preprocess_nuisance</span><span class="p">(</span><span class="n">public_nuisance_data</span><span class="p">)</span>
+    <span class="n">move_houses_data</span> <span class="o">=</span> <span class="n">bp</span><span class="o">.</span><span class="n">preprocess_houses</span><span class="p">(</span><span class="n">move_houses_data</span><span class="p">)</span>
+    <span class="n">green_index_data</span> <span class="o">=</span> <span class="n">bp</span><span class="o">.</span><span class="n">preprocess_green_index</span><span class="p">(</span><span class="n">green_index_data</span><span class="p">)</span>
+
+    <span class="n">helper</span><span class="o">.</span><span class="n">save_df</span><span class="p">(</span><span class="n">lights_data</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">LIGHTS_DATASET_NAME</span><span class="p">,</span> <span class="n">is_preprocessed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">save_df</span><span class="p">(</span><span class="n">poiS</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">POI_DATASET_NAME</span><span class="p">,</span> <span class="n">is_preprocessed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">helper</span><span class="o">.</span><span class="n">save_df</span><span class="p">(</span><span class="n">livability_index_data</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">LIVABILITY_DATASET_NAME</span><span class="p">,</span> <span class="n">is_preprocessed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">save_df</span><span class="p">(</span><span class="n">recorded_crimes_data</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">RECORDED_CRIMES_DATASET_NAME</span><span class="p">,</span> <span class="n">is_preprocessed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">helper</span><span class="o">.</span><span class="n">save_df</span><span class="p">(</span><span class="n">public_nuisance_data</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">PUBLIC_NUISANCE_DATASET_NAME</span><span class="p">,</span> <span class="n">is_preprocessed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">save_df</span><span class="p">(</span><span class="n">green_index_data</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">GREEN_INDEX_DATASET_NAME</span><span class="p">,</span> <span class="n">is_preprocessed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">save_df</span><span class="p">(</span><span class="n">move_houses_data</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">MOVE_HOUSES_DATASET_PREPROCESSED_NAME</span><span class="p">,</span> <span class="n">is_preprocessed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">merged</span> <span class="o">=</span> <span class="n">bp</span><span class="o">.</span><span class="n">merge_datasets</span><span class="p">(</span><span class="n">green_index_data</span><span class="p">,</span> <span class="n">move_houses_data</span><span class="p">,</span> <span class="n">public_nuisance_data</span><span class="p">,</span> <span class="n">recorded_crimes_data</span><span class="p">,</span>
+                               <span class="n">livability_index_data</span><span class="p">)</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">save_df</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">MERGED_DATA_NAME</span><span class="p">,</span> <span class="n">is_preprocessed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">merged</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">generate_path</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">generate_path</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">PATH</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">PREPROCESSED_DIRECTORY</span><span class="p">),</span>
+                                              <span class="n">constants</span><span class="o">.</span><span class="n">MERGED_DATA_NAME</span><span class="p">))</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">save_df</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">ORIGINAL_DATA_PER_YEAR_NAME</span><span class="p">,</span> <span class="n">is_preprocessed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_final</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">merged</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Neighbourhood&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;year&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">save_df</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">ORIGINAL_DATA_PER_NEIGHBOURHOOD_NAME</span><span class="p">,</span> <span class="n">is_preprocessed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_final</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">full_df</span> <span class="o">=</span> <span class="n">bp</span><span class="o">.</span><span class="n">calculate_custom_livability_index</span><span class="p">(</span><span class="n">merged</span><span class="p">)</span>
+    <span class="n">full_df</span><span class="p">[</span><span class="s1">&#39;Livability index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">merged</span><span class="p">[</span><span class="s1">&#39;Livability index&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">save_df</span><span class="p">(</span><span class="n">full_df</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">FULL_DATA_PER_YEAR_NAME</span><span class="p">,</span> <span class="n">is_preprocessed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_final</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">full_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Neighbourhood&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;year&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">save_df</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">FULL_DATA_PER_NEIGHBOURHOOD_NAME</span><span class="p">,</span> <span class="n">is_preprocessed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_final</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">final_df</span> <span class="o">=</span> <span class="n">bp</span><span class="o">.</span><span class="n">calculate_custom_livability_index</span><span class="p">(</span><span class="n">merged</span><span class="p">)</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">save_df</span><span class="p">(</span><span class="n">final_df</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">CUSTOM_DATA_PER_YEAR_NAME</span><span class="p">,</span> <span class="n">is_preprocessed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_final</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">final_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Neighbourhood&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;year&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">save_df</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">CUSTOM_DATA_PER_NEIGHBOURHOOD_NAME</span><span class="p">,</span> <span class="n">is_preprocessed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_final</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="train_model_on_new_data">
+<a class="viewcode-back" href="../../src.html#src.main.train_model_on_new_data">[docs]</a>
+<span class="k">def</span> <span class="nf">train_model_on_new_data</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function is created so that it can be linked to Poetry Custom Script Execution. It encapsulates the logic for the Model training process for this project.</span>
+<span class="sd">    :return:</span>
+<span class="sd">    NoneType</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lr_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">generate_path</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">generate_path</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">PATH</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">FINAL_DIRECTORY</span><span class="p">),</span>
+                                             <span class="n">constants</span><span class="o">.</span><span class="n">ORIGINAL_DATA_PER_NEIGHBOURHOOD_NAME</span><span class="p">))</span>
+    <span class="n">lr_model</span><span class="o">.</span><span class="n">train_lr_interaction</span><span class="p">(</span><span class="n">lr_df</span><span class="p">)</span>
+
+    <span class="n">rf_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">generate_path</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">generate_path</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">PATH</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">FINAL_DIRECTORY</span><span class="p">),</span>
+                                             <span class="n">constants</span><span class="o">.</span><span class="n">ORIGINAL_DATA_PER_YEAR_NAME</span><span class="p">))</span>
+    <span class="n">rf_model</span><span class="o">.</span><span class="n">train_random_forest_model</span><span class="p">(</span><span class="n">rf_df</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, BUas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
