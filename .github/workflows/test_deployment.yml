@@ -70,7 +70,8 @@ jobs:
           git commit -m "documentation auto commit"
           git pull
           git fetch
-          git rebase origin/documentation --skip
+          git rebase documentation -X theirs
+
       - name: Push changes to source branch
         uses: ad-m/github-push-action@master
         with:
