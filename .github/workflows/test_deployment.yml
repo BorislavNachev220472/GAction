@@ -70,7 +70,7 @@ jobs:
           git add .
           git commit -m "documentation auto commit"
           git checkout  documentation
-          git merge main -Xours
+          git merge main -Xours --allow-unrelated-histories
 
       - name: Push changes to source branch
         uses: ad-m/github-push-action@master
