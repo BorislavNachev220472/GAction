@@ -98,8 +98,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        run: |
-          git checkout origin deployment
+        uses: actions/checkout@v4
+        with:
+          path: main
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
