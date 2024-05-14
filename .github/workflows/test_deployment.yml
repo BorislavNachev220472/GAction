@@ -72,7 +72,8 @@ jobs:
           git commit -m "documentation auto commit"
           git checkout documentation
           git reset --soft HEAD@{1}
-          git rebase main -X ours
+          git add .
+          git commit -m "documentation auto commit"
 
       - name: Push changes to source branch
         uses: ad-m/github-push-action@master
