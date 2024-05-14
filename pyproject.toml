@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "src"
+name = "testASDDSA"
 version = "0.1.0"
 description = "DEMO pipeline"
 authors = ["Borislav Nachev <220472@buas.nl>",

@@ -148,7 +148,7 @@
 #          docker run --name super_plant_phenotyper3000 -d super_plant_phenotyper3000:latest
 #          docker exec -i super_plant_phenotyper3000 bash
 #          docker exec -d super_plant_phenotyper3000 sphinx-quickstart docs --quiet -p NPEC -a BUas -v 1.0 -t config/
-#          docker exec -d super_plant_phenotyper3000 sphinx-apidoc -o docs src/
+#          docker exec -d super_plant_phenotyper3000 sphinx-apidoc -o docs testASDDSA/
 #          docker exec -d super_plant_phenotyper3000 pip install sphinx-rtd-theme
 #          docker exec -d super_plant_phenotyper3000 -c "cd docs && make html"
 #  #      - name: update changes

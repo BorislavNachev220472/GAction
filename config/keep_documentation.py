@@ -1,7 +1,7 @@
 import os
 
 working_directory = r"./"
-retain = ["config", ".github", ".git", "src", "docs", ".venv"]
+retain = ["config", ".github", ".git", "testASDDSA", "docs", ".venv"]
 os.chdir(working_directory)
 
 for item in next(os.walk(working_directory))[1]:
