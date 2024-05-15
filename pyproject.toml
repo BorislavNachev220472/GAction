@@ -10,11 +10,11 @@ authors = ["Borislav Nachev <220472@buas.nl>",
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "3.10.14"
-tensorflow-io-gcs-filesystem = "0.30.0"
-tensorflow = "2.10.0"
-tensorflow-intel = { version = "2.10.0", platform = "win32" }
-tensorflow-macos = { version = "2.16.1", platform = "darwin" }
+python = ">3.10.0, <=3.10.14"
+tensorflow-io-gcs-filesystem = { version = "0.30.0", markers = "sys_platform == 'linux' or sys_platform == 'win32'" }
+tensorflow = { version = "2.10.0", markers = "sys_platform == 'linux' or sys_platform == 'win32'" }
+tensorflow-intel = { version = "2.10.0", markers = "sys_platform == 'win32'"}
+tensorflow-macos = { version = "2.10.0", markers = "sys_platform == 'darwin'" }
 opencv-python = "^4.9.0.80"
 pandas = "^2.2.2"
 patchify = "^0.2.3"
@@ -27,7 +27,7 @@ pytest = "^8.2.0"
 pytest-mock = "^3.14.0"
 sphinx = "^7.3.7"
 coverage = "^7.5.1"
-sphinx_rtd_theme = "2.0.0"
+sphinx_rtd_theme= "2.0.0"
 
 [build-system]
 requires = ["poetry-core"]
