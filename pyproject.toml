@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "testasddsa"
+name = "pyphenotyper"
 version = "0.1.0"
-description = "DEMO pipeline"
+description = "NPEC pipeline"
 authors = ["Borislav Nachev <220472@buas.nl>",
     "Vlad Bogdan Narcis Matache <224108@buas.nl",
     "Wesley van Gaalen <224682@buas.nl>",
@@ -13,7 +13,8 @@ readme = "README.md"
 python = "3.10.14"
 tensorflow-io-gcs-filesystem = "0.30.0"
 tensorflow = "2.10.0"
-#tensorflow-intel = "2.10.0"
+tensorflow-intel = { version = "2.10.0", platform = "win32" }
+tensorflow-macos = { version = "2.16.1", platform = "darwin" }
 opencv-python = "^4.9.0.80"
 pandas = "^2.2.2"
 patchify = "^0.2.3"
