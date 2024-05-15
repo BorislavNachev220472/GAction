@@ -10,7 +10,7 @@ authors = ["Borislav Nachev <220472@buas.nl>",
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">3.10.0, <=3.10.14"
+python = ">=3.10.0, <=3.10.14"
 tensorflow-io-gcs-filesystem = { version = "0.30.0", markers = "sys_platform == 'linux' or sys_platform == 'win32'" }
 tensorflow = { version = "2.10.0", markers = "sys_platform == 'linux' or sys_platform == 'win32'" }
 tensorflow-intel = { version = "2.10.0", markers = "sys_platform == 'win32'"}
