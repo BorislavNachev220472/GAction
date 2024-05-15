@@ -1,0 +1,16 @@
+name: Memory Check
+
+on:
+  push:
+    branches:
+      dev
+  workflow_dispatch:
+
+jobs:
+  PoetrySetup:
+    runs-on: ubuntu-latest
+  Memory:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        run: df -h
